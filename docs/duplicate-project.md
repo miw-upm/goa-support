@@ -71,7 +71,8 @@ Configurar en GitHub Secrets:
 - `SONAR_TOKEN`
 - `API_CLIENT_ID`
 - `API_CLIENT_SECRET`
-- `MONGODB_URI`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
 - `AWS_LIGHTSAIL_IP`
 - `AWS_LIGHTSAIL_USER`
 - `AWS_LIGHTSAIL_SSH_KEY`
@@ -88,7 +89,14 @@ Configurar en GitHub Secrets:
 
 ---
 
-## 8. Crear una release
+## 8. Crear las bases de datos
+- Bases de datos local:
+  - `docker exec -e PGPASSWORD='postgres' -it postgres-server psql -U postgres -d postgres -c "CREATE DATABASE goasupportdb;"`
+- Bases de datos aws:
+  - `docker exec -e PGPASSWORD='***' -it postgres-server psql -U *** -d postgres -c "CREATE DATABASE goasupportdb;"`
+
+---
+## 9. Crear una release
 - Crear tag de versión
 - Validar despliegue en AWS
   - Ver contenedores activos:
