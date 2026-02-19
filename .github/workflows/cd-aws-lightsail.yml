@@ -58,7 +58,8 @@ jobs:
               --name ${{ env.ARTIFACT }} \
               --restart always \
               --network goa \
-              -e MONGODB_URI="${{ secrets.MONGODB_URI }}" \
+              -e POSTGRES_USER="${{ secrets.POSTGRES_USER }}" \
+              -e POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" \
               -e API_CLIENT_ID="${{ secrets.API_CLIENT_ID }}" \
               -e API_CLIENT_SECRET="${{ secrets.API_CLIENT_SECRET }}" \
               ghcr.io/${{ env.REPOSITORY }}:latest
