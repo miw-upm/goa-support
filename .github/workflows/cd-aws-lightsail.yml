@@ -22,7 +22,7 @@ jobs:
           java-version: 21
           cache: maven
 
-      - name: 🏷️ Extract GitHub Container Registry, repository (lowercase) & version from pom
+      - name: 🏷️ Prepare container image metadata (repository in lowercase, artifact, version...)
         run: |
           echo "REPOSITORY=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
           echo "ARTIFACT=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)" >> $GITHUB_ENV          

@@ -28,7 +28,7 @@ jobs:
           cache: maven
 
       - name: 🛡️ Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: java
           queries: security-extended
@@ -37,10 +37,10 @@ jobs:
         run: mvn -B verify
 
       - name: 🔍 CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
 
       # Organización de la cuenta de Sonar: miw-upm-github
-      - name: 🏷️ Extract artifact from pom & Sonar Organization
+      - name: 🏷️ Prepare container image metadata, Sonar Organization & artifact from pom
         run: |
           echo "ORGANIZATION=miw-upm-github" >> $GITHUB_ENV
           echo "ARTIFACT=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)" >> $GITHUB_ENV
