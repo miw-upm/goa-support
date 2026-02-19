@@ -1,7 +1,12 @@
 spring:
-  data:
-    mongodb:
-      uri: ${MONGODB_URI}
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://postgres-server:5432/goasupportdb
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
   security:
     oauth2:
       jwk-uri: https://gestion.ocanabogados.es/api/goa-user/oauth2/jwks

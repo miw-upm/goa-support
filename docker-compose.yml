@@ -6,7 +6,7 @@ services:
     ports:
       - "8084:8084"
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://mongo:mongo@mongo:27017/goasupportdb?authSource=admin
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/goasupportdb
       EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: http://host.docker.internal:8761/eureka/
       SPRING_SECURITY_OAUTH2_JWK-URI: http://host.docker.internal:8080/api/goa-user/oauth2/jwks
       SPRING_SECURITY_OAUTH2_TOKEN-URI: http://host.docker.internal:8080/api/goa-user/oauth2/token
