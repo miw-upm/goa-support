@@ -23,5 +23,10 @@ networks:
 #> docker compose up --build -d
 #> docker compose up --build -d --scale goa-support=2
 
+# Para crear una bases de datos:
+#> docker exec -e PGPASSWORD='postgres' -it postgres-server psql -U postgres -d postgres -c "CREATE DATABASE goasupportdb;"
+# Para ver las bases de datos:
+#> docker exec -e PGPASSWORD='postgres' -it postgres-server psql -U postgres -d postgres -c "\l"
+
 # Para ver los logs de arranque
 #> docker logs -f goa-support
