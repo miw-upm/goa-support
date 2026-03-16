@@ -99,4 +99,32 @@ class IssuePersistenceJpaIT {
 
         assertThat(exists).isFalse();
     }
+
+    @Test
+    void shouldNotUpdateNonExistentIssue() {
+        UUID nonExistentId = UUID.randomUUID();
+
+        Issue issue = new Issue(
+                "Title",
+                "Description",
+                "Context",
+                Type.BUG,
+                UUID.randomUUID()
+        );
+
+        issuePersistence.update(nonExistentId, issue);
+
+        boolean exists = issueRepository.existsById(nonExistentId);
+        assertThat(exists).isFalse();
+    }
+
+    @Test
+    void shouldNotDeleteNonExistentIssue() {
+        UUID nonExistentId = UUID.randomUUID();
+
+        issuePersistence.delete(nonExistentId);
+
+        boolean exists = issueRepository.existsById(nonExistentId);
+        assertThat(exists).isFalse();
+    }
 }
