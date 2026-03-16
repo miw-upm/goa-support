@@ -1,5 +1,7 @@
 package es.upm.api.domain.services;
 
+import es.upm.api.domain.exceptions.NotFoundException;
+import es.upm.api.domain.model.IssueDto;
 import es.upm.api.domain.persistence.IssuePersistence;
 import es.upm.api.domain.webclients.UserWebClient;
 import es.upm.api.infrastructure.jpa.entities.Issue;
@@ -8,7 +10,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -23,11 +24,16 @@ public class IssueService {
         this.userWebClient = userWebClient;
     }
 
-    public Issue createIssue(Issue issue) {
+    public Issue createIssue(IssueDto issueDto) {
         UUID userId = getUserIdFromAuthentication();
-        issue.setCreatedByUserId(userId);
-        issue.setCreatedAt(LocalDateTime.now());
-        issue.setLastUpdateAt(LocalDateTime.now());
+        var issue = new Issue(
+                issueDto.getTitle(),
+                issueDto.getDescription(),
+                issueDto.getTechnicalContext(),
+                issueDto.getType(),
+                issueDto.getStatus(),
+                userId
+        );
         return issuePersistence.create(issue);
     }
 
@@ -36,6 +42,6 @@ public class IssueService {
         if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
             return userWebClient.readUserByMobile(jwt.getSubject()).getId();
         }
-        return null;
+        throw new NotFoundException("User not found in authentication context");
     }
 }
