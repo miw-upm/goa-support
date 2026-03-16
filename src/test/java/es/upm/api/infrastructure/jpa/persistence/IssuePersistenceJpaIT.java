@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class IssuePersistenceJpaTest {
+class IssuePersistenceJpaIT {
 
     @Autowired
     private IssuePersistenceJpa issuePersistence;

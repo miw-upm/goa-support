@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class IssueResourceIT {
+class IssueResourceFT {
 
     @Autowired
     private MockMvc mockMvc;
