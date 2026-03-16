@@ -7,7 +7,6 @@ import java.sql.Statement;
 import java.util.logging.Logger;
 
 @Generated("DbBootstrap not relevant for coverage")
-
 public class DbBootstrap {
 
     private static final Logger LOGGER = Logger.getLogger(DbBootstrap.class.getName());
@@ -23,6 +22,10 @@ public class DbBootstrap {
             String user = System.getenv("POSTGRES_USER");
             String pass = System.getenv("POSTGRES_PASSWORD");
             String dbName = System.getenv("DB_NAME");
+
+            if (!dbName.matches("[a-zA-Z0-9_]+")) {
+                throw new IllegalArgumentException("Invalid database name: " + dbName);
+            }
 
             String url = "jdbc:postgresql://" + host + ":" + port + "/postgres";
 
