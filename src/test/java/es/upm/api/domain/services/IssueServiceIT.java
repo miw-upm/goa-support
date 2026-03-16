@@ -139,6 +139,21 @@ class IssueServiceIT {
         issue.setGithubIssueUrl("https://github.com/test-owner/test-repo/issues/123");
         issue = issuePersistence.create(issue);
 
+        var userResponse = mock(es.upm.api.domain.model.UserDto.class);
+        when(userResponse.getId()).thenReturn(userId);
+        when(userResponse.getFirstName()).thenReturn("Ana");
+        when(userResponse.getFamilyName()).thenReturn("Lopez");
+        when(userResponse.getMobile()).thenReturn("600000000");
+        when(userResponse.getEmail()).thenReturn("ana@test.com");
+        when(userResponse.getAddress()).thenReturn("Street 1");
+        when(userResponse.getCity()).thenReturn("Madrid");
+        when(userResponse.getPostalCode()).thenReturn("28001");
+        when(userResponse.getProvince()).thenReturn("Madrid");
+        when(userResponse.getDocumentType()).thenReturn("DNI");
+        when(userResponse.getIdentity()).thenReturn("12345678A");
+        when(userResponse.getRole()).thenReturn("LAWYER");
+        when(userWebClient.readUserById(userId)).thenReturn(userResponse);
+
         IssueDto result = issueService.readIssueById(issue.getId());
 
         assertThat(result.getId()).isEqualTo(issue.getId());
@@ -149,6 +164,19 @@ class IssueServiceIT {
         assertThat(result.getStatus()).isEqualTo(Status.PENDING);
         assertThat(result.getGithubIssueId()).isEqualTo("123");
         assertThat(result.getGithubIssueUrl()).isEqualTo("https://github.com/test-owner/test-repo/issues/123");
+        assertThat(result.getCreatedByUser()).isNotNull();
+        assertThat(result.getCreatedByUser().getId()).isEqualTo(userId);
+        assertThat(result.getCreatedByUser().getFirstName()).isEqualTo("Ana");
+        assertThat(result.getCreatedByUser().getFamilyName()).isEqualTo("Lopez");
+        assertThat(result.getCreatedByUser().getMobile()).isEqualTo("600000000");
+        assertThat(result.getCreatedByUser().getEmail()).isEqualTo("ana@test.com");
+        assertThat(result.getCreatedByUser().getAddress()).isEqualTo("Street 1");
+        assertThat(result.getCreatedByUser().getCity()).isEqualTo("Madrid");
+        assertThat(result.getCreatedByUser().getPostalCode()).isEqualTo("28001");
+        assertThat(result.getCreatedByUser().getProvince()).isEqualTo("Madrid");
+        assertThat(result.getCreatedByUser().getDocumentType()).isEqualTo("DNI");
+        assertThat(result.getCreatedByUser().getIdentity()).isEqualTo("12345678A");
+        assertThat(result.getCreatedByUser().getRole()).isEqualTo("LAWYER");
 
         issuePersistence.delete(issue.getId());
     }

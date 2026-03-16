@@ -46,7 +46,10 @@ public class IssueService {
         if (issue == null) {
             throw new NotFoundException("Issue id: " + id);
         }
-        return new IssueDto(issue);
+
+        IssueDto issueDto = new IssueDto(issue);
+        issueDto.setCreatedByUser(userWebClient.readUserById(issue.getCreatedByUserId()));
+        return issueDto;
     }
 
     public IssueDto syncIssueStatus(UUID id) {

@@ -26,6 +26,7 @@ public class IssueDto {
     private String githubIssueUrl;
     private LocalDateTime createdAt;
     private UUID createdByUserId;
+    private UserDto createdByUser;
     private LocalDateTime lastUpdateAt;
 
     public IssueDto(Issue issue)
