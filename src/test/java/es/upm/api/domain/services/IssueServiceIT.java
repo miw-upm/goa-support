@@ -222,4 +222,24 @@ class IssueServiceIT {
                 () -> issueService.syncIssueStatus(UUID.randomUUID())
         );
     }
+
+    @Test
+    void shouldNotUpdateStatusWhenGitHubStateIsNull() {
+        UUID userId = UUID.randomUUID();
+        Issue issue = new Issue("Issue", "Description", "Context", Type.BUG, userId);
+        issue.setStatus(Status.PENDING);
+        issue.setGithubIssueId("17");
+        issue.setGithubIssueUrl("https://github.com/test-owner/test-repo/issues/17");
+        issue = issuePersistence.create(issue);
+
+        when(gitHubIssueWebClient.readIssueState("17", "https://github.com/test-owner/test-repo/issues/17"))
+                .thenReturn(null);
+
+        IssueDto result = issueService.syncIssueStatus(issue.getId());
+
+        assertThat(result.getStatus()).isEqualTo(Status.PENDING);
+        assertThat(issuePersistence.readById(issue.getId()).getStatus()).isEqualTo(Status.PENDING);
+
+        issuePersistence.delete(issue.getId());
+    }
 }
