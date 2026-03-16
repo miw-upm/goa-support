@@ -18,6 +18,11 @@ spring:
       token-uri: http://localhost:8080/api/goa-user/oauth2/token
       api-client-id: api-client-id
       api-client-secret: api-client-secret
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: false
 
 server:
   port: 8084

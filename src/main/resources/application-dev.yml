@@ -8,3 +8,14 @@ spring:
     url: jdbc:postgresql://localhost:5432/goasupportdb
     username: postgres
     password: postgres
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    config-url: /api/goa-support/v3/api-docs/swagger-config
+    url: /api/goa-support/v3/api-docs
+    oauth2-redirect-url: http://localhost:8080/api/goa-support/swagger-ui/oauth2-redirect.html
+    oauth:
+      client-id: client-id
+      client-secret: client-secret
+      use-pkce-with-authorization-code-grant: true
