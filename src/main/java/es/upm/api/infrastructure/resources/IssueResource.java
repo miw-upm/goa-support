@@ -1,7 +1,6 @@
 package es.upm.api.infrastructure.resources;
 
 import es.upm.api.domain.model.IssueDto;
-import es.upm.api.infrastructure.jpa.entities.Issue;
 import es.upm.api.domain.services.IssueService;
 import es.upm.api.infrastructure.resources.requests.CreateIssueRequest;
 import io.swagger.v3.oas.annotations.Operation;

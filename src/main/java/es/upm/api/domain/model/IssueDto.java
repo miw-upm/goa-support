@@ -14,14 +14,14 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 public class IssueDto {
-    public UUID id;
-    public String title;
-    public String description;
-    public String technicalContext;
+    private UUID id;
+    private String title;
+    private String description;
+    private String technicalContext;
     @Enumerated(EnumType.STRING)
-    public Type type;
+    private Type type;
     @Enumerated(EnumType.STRING)
-    public Status status;
+    private Status status;
     private String githubIssueId;
     private String githubIssueUrl;
     private LocalDateTime createdAt;
