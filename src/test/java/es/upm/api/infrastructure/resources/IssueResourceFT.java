@@ -2,6 +2,8 @@ package es.upm.api.infrastructure.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.upm.api.domain.model.IssueDto;
+import es.upm.api.domain.exceptions.NotFoundException;
+import es.upm.api.domain.model.UserDto;
 import es.upm.api.domain.services.IssueService;
 import es.upm.api.infrastructure.jpa.entities.Status;
 import es.upm.api.infrastructure.jpa.entities.Type;
@@ -21,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.UUID;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -87,5 +90,71 @@ class IssueResourceFT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(issueId.toString()))
                 .andExpect(jsonPath("$.status").value("FINISHED"));
+    }
+
+    @Test
+    @WithMockUser
+    void shouldReadIssueById() throws Exception {
+        UUID issueId = UUID.randomUUID();
+
+        IssueDto response = new IssueDto();
+        response.setId(issueId);
+        response.setTitle("Issue");
+        response.setDescription("Description");
+        response.setTechnicalContext("Context");
+        response.setType(Type.BUG);
+        response.setStatus(Status.PENDING);
+        response.setGithubIssueId("123");
+        response.setGithubIssueUrl("https://github.com/test-owner/test-repo/issues/123");
+        UserDto createdByUser = new UserDto();
+        createdByUser.setId(issueId);
+        createdByUser.setMobile("600000000");
+        createdByUser.setEmail("ana@test.com");
+        createdByUser.setFirstName("Ana");
+        createdByUser.setFamilyName("Lopez");
+        createdByUser.setAddress("Street 1");
+        createdByUser.setCity("Madrid");
+        createdByUser.setPostalCode("28001");
+        createdByUser.setProvince("Madrid");
+        createdByUser.setDocumentType("DNI");
+        createdByUser.setIdentity("12345678A");
+        createdByUser.setRole("LAWYER");
+        response.setCreatedByUser(createdByUser);
+
+        when(issueService.readIssueById(issueId)).thenReturn(response);
+
+        mockMvc.perform(get(IssueResource.ISSUES + "/{id}", issueId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(issueId.toString()))
+                .andExpect(jsonPath("$.title").value("Issue"))
+                .andExpect(jsonPath("$.description").value("Description"))
+                .andExpect(jsonPath("$.technicalContext").value("Context"))
+                .andExpect(jsonPath("$.type").value("BUG"))
+                .andExpect(jsonPath("$.status").value("PENDING"))
+                .andExpect(jsonPath("$.githubIssueId").value("123"))
+                .andExpect(jsonPath("$.githubIssueUrl").value("https://github.com/test-owner/test-repo/issues/123"))
+                .andExpect(jsonPath("$.createdByUser.id").value(issueId.toString()))
+                .andExpect(jsonPath("$.createdByUser.mobile").value("600000000"))
+                .andExpect(jsonPath("$.createdByUser.email").value("ana@test.com"))
+                .andExpect(jsonPath("$.createdByUser.firstName").value("Ana"))
+                .andExpect(jsonPath("$.createdByUser.familyName").value("Lopez"))
+                .andExpect(jsonPath("$.createdByUser.address").value("Street 1"))
+                .andExpect(jsonPath("$.createdByUser.city").value("Madrid"))
+                .andExpect(jsonPath("$.createdByUser.postalCode").value("28001"))
+                .andExpect(jsonPath("$.createdByUser.province").value("Madrid"))
+                .andExpect(jsonPath("$.createdByUser.documentType").value("DNI"))
+                .andExpect(jsonPath("$.createdByUser.identity").value("12345678A"))
+                .andExpect(jsonPath("$.createdByUser.role").value("LAWYER"));
+    }
+
+    @Test
+    @WithMockUser
+    void shouldReturnNotFoundWhenReadIssueByIdDoesNotExist() throws Exception {
+        UUID issueId = UUID.randomUUID();
+
+        when(issueService.readIssueById(issueId)).thenThrow(new NotFoundException("Issue id: " + issueId));
+
+        mockMvc.perform(get(IssueResource.ISSUES + "/{id}", issueId))
+                .andExpect(status().isNotFound());
     }
 }

@@ -14,6 +14,14 @@ import java.util.UUID;
 public class UserDto {
     private UUID id;
     private String mobile;
+    private String email;
     private String firstName;
     private String familyName;
+    private String address;
+    private String city;
+    private String postalCode;
+    private String province;
+    private String documentType;
+    private String identity;
+    private String role;
 }

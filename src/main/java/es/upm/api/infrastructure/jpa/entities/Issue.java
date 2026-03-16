@@ -21,8 +21,11 @@ public class Issue {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String title;
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
-    @Column(name = "technicalContext")
+    @Lob
+    @Column(name = "technicalContext", columnDefinition = "TEXT")
     private String technicalContext;
     @Enumerated(EnumType.ORDINAL)
     private Type type;

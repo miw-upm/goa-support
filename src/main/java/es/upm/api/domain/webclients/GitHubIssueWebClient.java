@@ -15,17 +15,11 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Component
 public class GitHubIssueWebClient {
-
-    private static final Pattern GITHUB_ISSUE_URL_PATTERN = Pattern.compile(
-            "https?://github\\.com/([^/]+)/([^/]+)/issues/(\\d+).*$",
-            Pattern.CASE_INSENSITIVE
-    );
 
     private final RestTemplate restTemplate;
     private final String apiUrl;
@@ -76,12 +70,9 @@ public class GitHubIssueWebClient {
 
     private String resolveIssueEndpoint(String githubIssueId, String githubIssueUrl) {
         if (StringUtils.hasText(githubIssueUrl)) {
-            Matcher matcher = GITHUB_ISSUE_URL_PATTERN.matcher(githubIssueUrl.trim());
-            if (matcher.matches()) {
-                String owner = matcher.group(1);
-                String repository = matcher.group(2);
-                String issueNumber = matcher.group(3);
-                return this.apiUrl + "/repos/" + owner + "/" + repository + "/issues/" + issueNumber;
+            GitHubIssueLocation issueLocation = this.parseGitHubIssueUrl(githubIssueUrl.trim());
+            if (issueLocation != null) {
+                return this.apiUrl + "/repos/" + issueLocation.owner() + "/" + issueLocation.repository() + "/issues/" + issueLocation.issueNumber();
             }
             throw new BadRequestException("Invalid GitHub issue URL format");
         }
@@ -95,7 +86,39 @@ public class GitHubIssueWebClient {
         throw new BadRequestException("Cannot resolve GitHub issue endpoint from issue data");
     }
 
+    private GitHubIssueLocation parseGitHubIssueUrl(String githubIssueUrl) {
+        try {
+            URI uri = URI.create(githubIssueUrl);
+            String host = uri.getHost();
+            if (!StringUtils.hasText(host) || !"github.com".equalsIgnoreCase(host)) {
+                return null;
+            }
+
+            String path = uri.getPath();
+            if (!StringUtils.hasText(path)) {
+                return null;
+            }
+
+            String[] segments = path.split("/");
+            if (segments.length < 5 || !"issues".equals(segments[3])) {
+                return null;
+            }
+
+            String issueNumber = segments[4];
+            if (!issueNumber.chars().allMatch(Character::isDigit)) {
+                return null;
+            }
+
+            return new GitHubIssueLocation(segments[1], segments[2], issueNumber);
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
+    }
+
     private record GitHubIssueResponse(String state) {
+    }
+
+    private record GitHubIssueLocation(String owner, String repository, String issueNumber) {
     }
 
     public enum GitHubIssueState {
