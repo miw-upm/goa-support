@@ -111,4 +111,26 @@ class IssuePersistenceJpaIT {
         boolean exists = issueRepository.existsById(nonExistentId);
         assertThat(exists).isFalse();
     }
+
+    @Test
+    void shouldPersistLongDescriptionAndTechnicalContext() {
+        UUID userId = UUID.randomUUID();
+        String longDescription = "A".repeat(5000);
+        String longTechnicalContext = "B".repeat(6000);
+
+        Issue issue = new Issue(
+                "Title",
+                longDescription,
+                longTechnicalContext,
+                Type.BUG,
+                userId
+        );
+
+        Issue created = issuePersistence.create(issue);
+        Issue found = issuePersistence.readById(created.getId());
+
+        assertThat(found).isNotNull();
+        assertThat(found.getDescription()).isEqualTo(longDescription);
+        assertThat(found.getTechnicalContext()).isEqualTo(longTechnicalContext);
+    }
 }
