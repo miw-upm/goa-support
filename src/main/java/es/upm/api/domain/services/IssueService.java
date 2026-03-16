@@ -5,6 +5,7 @@ import es.upm.api.domain.model.IssueDto;
 import es.upm.api.domain.persistence.IssuePersistence;
 import es.upm.api.domain.webclients.UserWebClient;
 import es.upm.api.infrastructure.jpa.entities.Issue;
+import es.upm.api.infrastructure.resources.requests.CreateIssueRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -24,17 +25,16 @@ public class IssueService {
         this.userWebClient = userWebClient;
     }
 
-    public Issue createIssue(IssueDto issueDto) {
+    public IssueDto createIssue(CreateIssueRequest issueDto) {
         UUID userId = getUserIdFromAuthentication();
         var issue = new Issue(
                 issueDto.getTitle(),
                 issueDto.getDescription(),
                 issueDto.getTechnicalContext(),
                 issueDto.getType(),
-                issueDto.getStatus(),
                 userId
         );
-        return issuePersistence.create(issue);
+        return new IssueDto(issuePersistence.create(issue));
     }
 
     private UUID getUserIdFromAuthentication() {

@@ -42,12 +42,12 @@ public class Issue {
     @Column(name = "lastUpdateAt")
     private LocalDateTime lastUpdateAt;
 
-    public Issue(String title, String description, String technicalContext, Type type, Status status, UUID createdByUserId) {
+    public Issue(String title, String description, String technicalContext, Type type, UUID createdByUserId) {
         this.title = title;
         this.description = description;
         this.technicalContext = technicalContext;
         this.type = type;
-        this.status = status;
+        this.status = Status.PENDING;
         this.createdAt = LocalDateTime.now();
         this.createdByUserId = createdByUserId;
         this.githubIssueId = null;

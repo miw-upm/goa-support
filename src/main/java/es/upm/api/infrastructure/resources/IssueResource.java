@@ -3,6 +3,7 @@ package es.upm.api.infrastructure.resources;
 import es.upm.api.domain.model.IssueDto;
 import es.upm.api.infrastructure.jpa.entities.Issue;
 import es.upm.api.domain.services.IssueService;
+import es.upm.api.infrastructure.resources.requests.CreateIssueRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +25,8 @@ public class IssueResource {
 
     @PostMapping
     @Operation(summary = "Create a new issue", description = "Creates a new issue with the provided details")
-    public ResponseEntity<Issue> createIssue(@Valid @RequestBody IssueDto issueDto) {
-        Issue savedIssue = issueService.createIssue(issueDto);
+    public ResponseEntity<IssueDto> createIssue(@Valid @RequestBody CreateIssueRequest issueDto) {
+        IssueDto savedIssue = issueService.createIssue(issueDto);
         return ResponseEntity.ok(savedIssue);
     }
 }
