@@ -2,8 +2,10 @@ package es.upm.api.domain.services;
 
 import es.upm.api.domain.model.IssueDto;
 import es.upm.api.domain.persistence.IssuePersistence;
+import es.upm.api.domain.webclients.GitHubIssueWebClient;
 import es.upm.api.domain.webclients.UserWebClient;
 import es.upm.api.infrastructure.jpa.entities.Issue;
+import es.upm.api.infrastructure.jpa.entities.Status;
 import es.upm.api.infrastructure.jpa.entities.Type;
 import es.upm.api.infrastructure.resources.requests.CreateIssueRequest;
 
@@ -25,6 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 
@@ -41,6 +44,9 @@ class IssueServiceIT {
 
     @MockitoBean
     private UserWebClient userWebClient;
+
+    @MockitoBean
+    private GitHubIssueWebClient gitHubIssueWebClient;
 
     @AfterEach
     void cleanSecurity() {
@@ -122,6 +128,68 @@ class IssueServiceIT {
                             setType(Type.BUG);
                         }}
                 ))
+        );
+    }
+
+    @Test
+    void shouldSyncIssueToFinishedWhenGitHubIssueIsClosed() {
+        UUID userId = UUID.randomUUID();
+        Issue issue = new Issue("Issue", "Description", "Context", Type.BUG, userId);
+        issue.setGithubIssueId("15");
+        issue.setGithubIssueUrl("https://github.com/test-owner/test-repo/issues/15");
+        issue = issuePersistence.create(issue);
+
+        when(gitHubIssueWebClient.readIssueState("15", "https://github.com/test-owner/test-repo/issues/15"))
+                .thenReturn(GitHubIssueWebClient.GitHubIssueState.CLOSED);
+
+        IssueDto result = issueService.syncIssueStatus(issue.getId());
+
+        assertThat(result.getStatus()).isEqualTo(Status.FINISHED);
+        assertThat(issuePersistence.readById(issue.getId()).getStatus()).isEqualTo(Status.FINISHED);
+
+        issuePersistence.delete(issue.getId());
+    }
+
+    @Test
+    void shouldKeepIssueStatusWhenGitHubIssueIsOpen() {
+        UUID userId = UUID.randomUUID();
+        Issue issue = new Issue("Issue", "Description", "Context", Type.BUG, userId);
+        issue.setStatus(Status.IN_PROGRESS);
+        issue.setGithubIssueId("16");
+        issue.setGithubIssueUrl("https://github.com/test-owner/test-repo/issues/16");
+        issue = issuePersistence.create(issue);
+
+        when(gitHubIssueWebClient.readIssueState("16", "https://github.com/test-owner/test-repo/issues/16"))
+                .thenReturn(GitHubIssueWebClient.GitHubIssueState.OPEN);
+
+        IssueDto result = issueService.syncIssueStatus(issue.getId());
+
+        assertThat(result.getStatus()).isEqualTo(Status.IN_PROGRESS);
+        assertThat(issuePersistence.readById(issue.getId()).getStatus()).isEqualTo(Status.IN_PROGRESS);
+
+        issuePersistence.delete(issue.getId());
+    }
+
+    @Test
+    void shouldSkipSynchronizationWhenIssueHasNoGitHubAssociation() {
+        UUID userId = UUID.randomUUID();
+        Issue issue = new Issue("Issue", "Description", "Context", Type.BUG, userId);
+        issue.setStatus(Status.PENDING);
+        issue = issuePersistence.create(issue);
+
+        IssueDto result = issueService.syncIssueStatus(issue.getId());
+
+        assertThat(result.getStatus()).isEqualTo(Status.PENDING);
+        verifyNoInteractions(gitHubIssueWebClient);
+
+        issuePersistence.delete(issue.getId());
+    }
+
+    @Test
+    void shouldThrowNotFoundExceptionWhenSyncIssueDoesNotExist() {
+        assertThrows(
+                es.upm.api.domain.exceptions.NotFoundException.class,
+                () -> issueService.syncIssueStatus(UUID.randomUUID())
         );
     }
 }

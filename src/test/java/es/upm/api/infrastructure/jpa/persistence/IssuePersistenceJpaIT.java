@@ -1,6 +1,7 @@
 package es.upm.api.infrastructure.jpa.persistence;
 
 import es.upm.api.infrastructure.jpa.entities.Issue;
+import es.upm.api.infrastructure.jpa.entities.Status;
 import es.upm.api.infrastructure.jpa.entities.Type;
 import es.upm.api.infrastructure.jpa.repositories.IssueRepository;
 
@@ -48,7 +49,7 @@ class IssuePersistenceJpaIT {
     }
 
     @Test
-    void shouldUpdateIssue() {
+    void shouldUpdateStatusIssue() {
 
         UUID userId = UUID.randomUUID();
 
@@ -62,20 +63,11 @@ class IssuePersistenceJpaIT {
 
         Issue created = issueRepository.save(issue);
 
-        Issue updated = new Issue(
-                "New Title",
-                "New Description",
-                "New Context",
-                Type.BUG,
-                userId
-        );
-
-        issuePersistence.update(created.getId(), updated);
+        issuePersistence.updateStatus(created.getId(), es.upm.api.infrastructure.jpa.entities.Status.IN_PROGRESS);
 
         Issue found = issueRepository.findById(created.getId()).orElseThrow();
 
-        assertThat(found.getTitle()).isEqualTo("New Title");
-        assertThat(found.getDescription()).isEqualTo("New Description");
+        assertThat(found.getStatus()).isEqualTo(es.upm.api.infrastructure.jpa.entities.Status.IN_PROGRESS);
     }
 
     @Test
@@ -101,18 +93,10 @@ class IssuePersistenceJpaIT {
     }
 
     @Test
-    void shouldNotUpdateNonExistentIssue() {
+    void shouldNotUpdateStatusNonExistentIssue() {
         UUID nonExistentId = UUID.randomUUID();
 
-        Issue issue = new Issue(
-                "Title",
-                "Description",
-                "Context",
-                Type.BUG,
-                UUID.randomUUID()
-        );
-
-        issuePersistence.update(nonExistentId, issue);
+        issuePersistence.updateStatus(nonExistentId, Status.PENDING);
 
         boolean exists = issueRepository.existsById(nonExistentId);
         assertThat(exists).isFalse();
