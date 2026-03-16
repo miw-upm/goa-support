@@ -10,4 +10,12 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
-CMD ["java", "-jar", "app.jar"]
+
+# Set environment variables for database creation
+ENV DB_HOST=postgres-server
+ENV DB_PORT=5432
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=postgres
+ENV DB_NAME=goasupportdb
+
+CMD ["java", "-jar", "/app/app.jar"]
