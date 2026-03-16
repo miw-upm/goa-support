@@ -26,6 +26,7 @@ springdoc:
 
 server:
   port: 8084
+  forward-headers-strategy: framework
 
 info:
   app:
