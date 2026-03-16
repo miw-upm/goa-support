@@ -66,6 +66,6 @@ feign:
 
 github:
   api-url: https://api.github.com
-  token: ${GITHUB_TOKEN:}
-  repository-owner: ${GITHUB_REPOSITORY_OWNER:}
-  repository-name: ${GITHUB_REPOSITORY_NAME:}
+  token: ${GIT_TOKEN:}
+  repository-owner: ${GIT_REPOSITORY_OWNER:}
+  repository-name: ${GIT_REPOSITORY_NAME:}
