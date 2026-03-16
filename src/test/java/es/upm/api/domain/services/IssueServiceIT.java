@@ -88,4 +88,40 @@ class IssueServiceIT {
 
         issuePersistence.delete(persisted.getId());
     }
+
+    @Test
+    void shouldThrowNotFoundExceptionWhenAuthenticationIsMissing() {
+        SecurityContextHolder.clearContext();
+
+        org.junit.jupiter.api.Assertions.assertThrows(
+                es.upm.api.domain.exceptions.NotFoundException.class,
+                () -> issueService.createIssue(new IssueDto(
+                        new CreateIssueRequest() {{
+                            setTitle("Test");
+                            setDescription("Desc");
+                            setTechnicalContext("Ctx");
+                            setType(Type.BUG);
+                        }}
+                ))
+        );
+    }
+
+    @Test
+    void shouldThrowNotFoundExceptionWhenPrincipalIsNotJwt() {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("not-jwt", null)
+        );
+
+        org.junit.jupiter.api.Assertions.assertThrows(
+                es.upm.api.domain.exceptions.NotFoundException.class,
+                () -> issueService.createIssue(new IssueDto(
+                        new CreateIssueRequest() {{
+                            setTitle("Test");
+                            setDescription("Desc");
+                            setTechnicalContext("Ctx");
+                            setType(Type.BUG);
+                        }}
+                ))
+        );
+    }
 }
