@@ -58,8 +58,10 @@
         <springdoc-openapi-starter-webmvc-ui.version>2.8.14</springdoc-openapi-starter-webmvc-ui.version>
         <!-- Spring cloud -->
         <spring-cloud.version>2025.0.1</spring-cloud.version>
-        <sonar.exclusions>src/main/java/es/upm/api/DbBootstrap.java</sonar.exclusions>
-        <sonar.exclusions>src/main/java/es/upm/api/Application.java</sonar.exclusions>
+        <sonar.exclusions>
+            src/main/java/es/upm/api/DbBootstrap.java,
+            src/main/java/es/upm/api/Application.java
+        </sonar.exclusions>
     </properties>
 
     <dependencies>
