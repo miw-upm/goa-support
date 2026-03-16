@@ -63,3 +63,9 @@ feign:
       default:
         connectTimeout: 5000
         readTimeout: 5000
+
+github:
+  api-url: https://api.github.com
+  token: ${GITHUB_TOKEN:}
+  repository-owner: ${GITHUB_REPOSITORY_OWNER:}
+  repository-name: ${GITHUB_REPOSITORY_NAME:}
