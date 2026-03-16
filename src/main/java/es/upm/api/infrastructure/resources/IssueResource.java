@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(IssueResource.ISSUES)
@@ -27,6 +28,12 @@ public class IssueResource {
     public ResponseEntity<IssueDto> createIssue(@Valid @RequestBody CreateIssueRequest request) {
         IssueDto savedIssue = issueService.createIssue(new IssueDto(request));
         return ResponseEntity.ok(savedIssue);
+    }
+
+    @PutMapping("/{id}/sync")
+    @Operation(summary = "Sync issue status with GitHub", description = "Synchronizes issue status based on associated GitHub issue state")
+    public ResponseEntity<IssueDto> syncIssueStatus(@PathVariable UUID id) {
+        return ResponseEntity.ok(issueService.syncIssueStatus(id));
     }
 }
 
