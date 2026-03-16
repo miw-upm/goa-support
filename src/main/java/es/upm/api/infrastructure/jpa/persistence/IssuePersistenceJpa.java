@@ -32,4 +32,11 @@ public class IssuePersistenceJpa implements IssuePersistence {
             issueJpaRepository.save(issue);
         }
     }
+
+    @Override
+    public void delete(UUID id) {
+        if (issueJpaRepository.existsById(id)) {
+            issueJpaRepository.deleteById(id);
+        }
+    }
 }

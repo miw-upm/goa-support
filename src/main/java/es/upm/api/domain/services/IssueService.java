@@ -25,7 +25,7 @@ public class IssueService {
         this.userWebClient = userWebClient;
     }
 
-    public IssueDto createIssue(CreateIssueRequest issueDto) {
+    public IssueDto createIssue(IssueDto issueDto) {
         UUID userId = getUserIdFromAuthentication();
         var issue = new Issue(
                 issueDto.getTitle(),

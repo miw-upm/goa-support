@@ -25,8 +25,8 @@ public class IssueResource {
 
     @PostMapping
     @Operation(summary = "Create a new issue", description = "Creates a new issue with the provided details")
-    public ResponseEntity<IssueDto> createIssue(@Valid @RequestBody CreateIssueRequest issueDto) {
-        IssueDto savedIssue = issueService.createIssue(issueDto);
+    public ResponseEntity<IssueDto> createIssue(@Valid @RequestBody CreateIssueRequest request) {
+        IssueDto savedIssue = issueService.createIssue(new IssueDto(request));
         return ResponseEntity.ok(savedIssue);
     }
 }

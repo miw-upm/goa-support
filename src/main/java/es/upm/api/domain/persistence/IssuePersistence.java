@@ -10,4 +10,5 @@ public interface IssuePersistence {
     Issue readById(UUID id);
     Issue create(Issue issue);
     void update(UUID id, Issue issue);
+    void delete(UUID id);
 }
