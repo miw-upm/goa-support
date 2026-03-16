@@ -132,6 +132,36 @@ class IssueServiceIT {
     }
 
     @Test
+    void shouldReadIssueByIdSuccessfully() {
+        UUID userId = UUID.randomUUID();
+        Issue issue = new Issue("Issue", "Description", "Context", Type.BUG, userId);
+        issue.setGithubIssueId("123");
+        issue.setGithubIssueUrl("https://github.com/test-owner/test-repo/issues/123");
+        issue = issuePersistence.create(issue);
+
+        IssueDto result = issueService.readIssueById(issue.getId());
+
+        assertThat(result.getId()).isEqualTo(issue.getId());
+        assertThat(result.getTitle()).isEqualTo("Issue");
+        assertThat(result.getDescription()).isEqualTo("Description");
+        assertThat(result.getTechnicalContext()).isEqualTo("Context");
+        assertThat(result.getType()).isEqualTo(Type.BUG);
+        assertThat(result.getStatus()).isEqualTo(Status.PENDING);
+        assertThat(result.getGithubIssueId()).isEqualTo("123");
+        assertThat(result.getGithubIssueUrl()).isEqualTo("https://github.com/test-owner/test-repo/issues/123");
+
+        issuePersistence.delete(issue.getId());
+    }
+
+    @Test
+    void shouldThrowNotFoundExceptionWhenReadIssueByIdDoesNotExist() {
+        assertThrows(
+                es.upm.api.domain.exceptions.NotFoundException.class,
+                () -> issueService.readIssueById(UUID.randomUUID())
+        );
+    }
+
+    @Test
     void shouldSyncIssueToFinishedWhenGitHubIssueIsClosed() {
         UUID userId = UUID.randomUUID();
         Issue issue = new Issue("Issue", "Description", "Context", Type.BUG, userId);

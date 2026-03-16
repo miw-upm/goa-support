@@ -41,6 +41,14 @@ public class IssueService {
         return new IssueDto(issuePersistence.create(issue));
     }
 
+    public IssueDto readIssueById(UUID id) {
+        Issue issue = issuePersistence.readById(id);
+        if (issue == null) {
+            throw new NotFoundException("Issue id: " + id);
+        }
+        return new IssueDto(issue);
+    }
+
     public IssueDto syncIssueStatus(UUID id) {
         Issue issue = issuePersistence.readById(id);
         if (issue == null) {

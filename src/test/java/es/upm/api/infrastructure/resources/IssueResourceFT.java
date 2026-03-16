@@ -2,6 +2,7 @@ package es.upm.api.infrastructure.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.upm.api.domain.model.IssueDto;
+import es.upm.api.domain.exceptions.NotFoundException;
 import es.upm.api.domain.services.IssueService;
 import es.upm.api.infrastructure.jpa.entities.Status;
 import es.upm.api.infrastructure.jpa.entities.Type;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.UUID;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -87,5 +89,45 @@ class IssueResourceFT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(issueId.toString()))
                 .andExpect(jsonPath("$.status").value("FINISHED"));
+    }
+
+    @Test
+    @WithMockUser
+    void shouldReadIssueById() throws Exception {
+        UUID issueId = UUID.randomUUID();
+
+        IssueDto response = new IssueDto();
+        response.setId(issueId);
+        response.setTitle("Issue");
+        response.setDescription("Description");
+        response.setTechnicalContext("Context");
+        response.setType(Type.BUG);
+        response.setStatus(Status.PENDING);
+        response.setGithubIssueId("123");
+        response.setGithubIssueUrl("https://github.com/test-owner/test-repo/issues/123");
+
+        when(issueService.readIssueById(issueId)).thenReturn(response);
+
+        mockMvc.perform(get(IssueResource.ISSUES + "/{id}", issueId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(issueId.toString()))
+                .andExpect(jsonPath("$.title").value("Issue"))
+                .andExpect(jsonPath("$.description").value("Description"))
+                .andExpect(jsonPath("$.technicalContext").value("Context"))
+                .andExpect(jsonPath("$.type").value("BUG"))
+                .andExpect(jsonPath("$.status").value("PENDING"))
+                .andExpect(jsonPath("$.githubIssueId").value("123"))
+                .andExpect(jsonPath("$.githubIssueUrl").value("https://github.com/test-owner/test-repo/issues/123"));
+    }
+
+    @Test
+    @WithMockUser
+    void shouldReturnNotFoundWhenReadIssueByIdDoesNotExist() throws Exception {
+        UUID issueId = UUID.randomUUID();
+
+        when(issueService.readIssueById(issueId)).thenThrow(new NotFoundException("Issue id: " + issueId));
+
+        mockMvc.perform(get(IssueResource.ISSUES + "/{id}", issueId))
+                .andExpect(status().isNotFound());
     }
 }

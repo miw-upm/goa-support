@@ -30,6 +30,12 @@ public class IssueResource {
         return ResponseEntity.ok(savedIssue);
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Read issue by id", description = "Returns full details for the requested issue")
+    public ResponseEntity<IssueDto> readIssueById(@PathVariable UUID id) {
+        return ResponseEntity.ok(issueService.readIssueById(id));
+    }
+
     @PutMapping("/{id}/sync")
     @Operation(summary = "Sync issue status with GitHub", description = "Synchronizes issue status based on associated GitHub issue state")
     public ResponseEntity<IssueDto> syncIssueStatus(@PathVariable UUID id) {
