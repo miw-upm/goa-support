@@ -3,6 +3,7 @@ package es.upm.api.infrastructure.resources;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.upm.api.domain.model.IssueDto;
 import es.upm.api.domain.services.IssueService;
+import es.upm.api.infrastructure.jpa.entities.Status;
 import es.upm.api.infrastructure.jpa.entities.Type;
 import es.upm.api.infrastructure.resources.requests.CreateIssueRequest;
 
@@ -21,6 +22,7 @@ import java.util.UUID;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -67,5 +69,23 @@ class IssueResourceFT {
                 .andExpect(jsonPath("$.description").value("Description"))
                 .andExpect(jsonPath("$.technicalContext").value("Context"))
                 .andExpect(jsonPath("$.type").value("BUG"));
+    }
+
+    @Test
+    @WithMockUser
+    void shouldSyncIssueStatus() throws Exception {
+        UUID issueId = UUID.randomUUID();
+
+        IssueDto response = new IssueDto();
+        response.setId(issueId);
+        response.setStatus(Status.FINISHED);
+
+        when(issueService.syncIssueStatus(issueId)).thenReturn(response);
+
+        mockMvc.perform(put(IssueResource.ISSUES + "/{id}/sync", issueId)
+                        .contentType("application/json"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(issueId.toString()))
+                .andExpect(jsonPath("$.status").value("FINISHED"));
     }
 }
