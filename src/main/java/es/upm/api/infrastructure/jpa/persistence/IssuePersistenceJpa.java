@@ -2,6 +2,7 @@ package es.upm.api.infrastructure.jpa.persistence;
 
 import es.upm.api.domain.persistence.IssuePersistence;
 import es.upm.api.infrastructure.jpa.entities.Issue;
+import es.upm.api.infrastructure.jpa.entities.Status;
 import es.upm.api.infrastructure.jpa.repositories.IssueRepository;
 import org.springframework.stereotype.Repository;
 
@@ -26,11 +27,11 @@ public class IssuePersistenceJpa implements IssuePersistence {
     }
 
     @Override
-    public void update(UUID id, Issue issue) {
-        if (issueJpaRepository.existsById(id)) {
-            issue.setId(id);
-            issueJpaRepository.save(issue);
-        }
+    public void updateStatus(UUID id, Status status) {
+        issueJpaRepository.findById(id).ifPresent(issueDb -> {
+            issueDb.setStatus(status);
+            issueJpaRepository.save(issueDb);
+        });
     }
 
     @Override
