@@ -22,7 +22,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: ocanabogados.derecho@gmail.com
-    password: NonePassword
+    password: aaaa bbbb cccc dddd
     properties:
       mail:
         smtp:

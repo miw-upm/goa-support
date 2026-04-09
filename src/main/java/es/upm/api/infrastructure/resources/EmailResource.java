@@ -23,6 +23,7 @@ public class EmailResource {
 
     @PostMapping(SIMPLE)
     public void sendSimple(@Valid @RequestBody Email email) {
+        System.out.println(">>>>>>>>>>>>>>Sending email: " + email);
         this.emailService.sendSimple(email);
     }
 
