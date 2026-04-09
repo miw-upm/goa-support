@@ -3,12 +3,14 @@ package es.upm.api.infrastructure.resources;
 import es.upm.api.domain.model.Email;
 import es.upm.api.domain.services.EmailService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@PreAuthorize(Security.ADMIN_MANAGER_OPERATOR)
 @RequestMapping(EmailResource.EMAILS)
 public class EmailResource {
     public static final String EMAILS = "/emails";
@@ -23,7 +25,6 @@ public class EmailResource {
 
     @PostMapping(SIMPLE)
     public void sendSimple(@Valid @RequestBody Email email) {
-        System.out.println(">>>>>>>>>>>>>>Sending email: " + email);
         this.emailService.sendSimple(email);
     }
 
