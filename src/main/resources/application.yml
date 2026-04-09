@@ -18,6 +18,22 @@ spring:
       token-uri: http://localhost:8080/api/goa-user/oauth2/token
       api-client-id: api-client-id
       api-client-secret: api-client-secret
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ocanabogados.derecho@gmail.com
+    password: NonePassword
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+app:
+  mail:
+    from: ocanabogados.derecho@gmail.com
 
 server:
   port: 8084
