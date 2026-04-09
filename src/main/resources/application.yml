@@ -33,7 +33,7 @@ spring:
 
 app:
   mail:
-    from: ocanabogados.derecho@gmail.com
+    from: derecho@ocanabogados.es
 
 server:
   port: 8084
