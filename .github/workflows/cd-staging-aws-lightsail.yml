@@ -47,9 +47,9 @@ jobs:
       - name: 🚀 Deploy on AWS Lightsail
         uses: appleboy/ssh-action@v1.2.1
         with:
-          host: ${{ secrets.AWS_LIGHTSAIL_IP }}
-          username: ${{ secrets.AWS_LIGHTSAIL_USER }}
-          key: ${{ secrets.AWS_LIGHTSAIL_SSH_KEY }}
+          host: ${{ secrets.AWS_LIGHTSAIL_IP_STAGING }}
+          username: ${{ secrets.AWS_LIGHTSAIL_USER_STAGING }}
+          key: ${{ secrets.AWS_LIGHTSAIL_SSH_KEY_STAGING }}
           script: |
             echo ${{ secrets.GHCR_PERSONAL_ACCESS_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker rm -f ${{ env.ARTIFACT }} || true
