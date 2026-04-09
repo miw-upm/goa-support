@@ -1,10 +1,2 @@
-# Local Mongodb database (local or Dockerized) -------------
-spring:
-  jpa:
-    hibernate:
-      ddl-auto: update
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/goasupportdb
-    username: postgres
-    password: postgres
+
+
