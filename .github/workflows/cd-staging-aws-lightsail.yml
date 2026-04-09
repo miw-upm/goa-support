@@ -1,8 +1,8 @@
-name: CD. AWS Lightsail
+name: CD
 on:
   push:
     branches:
-      - master
+      - staging
 
 jobs:
   cd:
@@ -47,9 +47,9 @@ jobs:
       - name: 🚀 Deploy on AWS Lightsail
         uses: appleboy/ssh-action@v1.2.1
         with:
-          host: ${{ secrets.AWS_LIGHTSAIL_IP }}
-          username: ${{ secrets.AWS_LIGHTSAIL_USER }}
-          key: ${{ secrets.AWS_LIGHTSAIL_SSH_KEY }}
+          host: ${{ secrets.AWS_LIGHTSAIL_IP_STAGING }}
+          username: ${{ secrets.AWS_LIGHTSAIL_USER_STAGING }}
+          key: ${{ secrets.AWS_LIGHTSAIL_SSH_KEY_STAGING }}
           script: |
             echo ${{ secrets.GHCR_PERSONAL_ACCESS_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker rm -f ${{ env.ARTIFACT }} || true
@@ -58,8 +58,10 @@ jobs:
               --name ${{ env.ARTIFACT }} \
               --restart always \
               --network goa \
-              -e POSTGRES_USER="${{ secrets.POSTGRES_USER }}" \
-              -e POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" \
+              --memory 512m \
+              --memory-swap 1024m \
+              -e HOST="https://goa.miwupm.es" \
+              -e MAIL_PASSWORD="${{ secrets.GMAIL_APP_PASSWORD }}" \
               -e API_CLIENT_ID="${{ secrets.API_CLIENT_ID }}" \
               -e API_CLIENT_SECRET="${{ secrets.API_CLIENT_SECRET }}" \
               ghcr.io/${{ env.REPOSITORY }}:latest

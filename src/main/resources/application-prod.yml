@@ -1,19 +1,12 @@
 spring:
-  jpa:
-    hibernate:
-      ddl-auto: update
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://postgres-server:5432/goasupportdb
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
   security:
     oauth2:
-      jwk-uri: https://gestion.ocanabogados.es/api/goa-user/oauth2/jwks
-      token-uri: https://gestion.ocanabogados.es/api/goa-user/oauth2/token
+      jwk-uri: ${HOST}/api/goa-user/oauth2/jwks
+      token-uri: ${HOST}/api/goa-user/oauth2/token
       api-client-id: ${API_CLIENT_ID}
       api-client-secret: ${API_CLIENT_SECRET}
-
+  mail:
+    password: ${MAIL_PASSWORD}
 
 eureka:
   client:
