@@ -79,9 +79,9 @@ public class ResourceServerConfig {  // validate tokens y security APIs con SCOP
         return jwtAuthenticationConverter;
     }
 
-    @Bean
-    public JwtDecoder jwtDecoder(@Value("${spring.security.oauth2.jwk-uri}") String jwkUri) {
-        return NimbusJwtDecoder.withJwkSetUri(jwkUri).build();
-    }
+//    @Bean
+//    public JwtDecoder jwtDecoder(@Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}") String jwkUri) {
+//        return NimbusJwtDecoder.withJwkSetUri(jwkUri).build();
+//    }
 
 }

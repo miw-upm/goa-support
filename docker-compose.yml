@@ -9,8 +9,8 @@ services:
       JAVA_OPTS: "-Xms64m -Xmx384m"
       mem_limit: 512m
       EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: http://host.docker.internal:8761/eureka/
-      SPRING_SECURITY_OAUTH2_JWK-URI: http://host.docker.internal:8080/api/goa-user/oauth2/jwks
-      SPRING_SECURITY_OAUTH2_TOKEN-URI: http://host.docker.internal:8080/api/goa-user/oauth2/token
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://host.docker.internal:8080/api/goa-user/oauth2/jwks
+      APP_OAUTH2_TOKEN_URI: http://host.docker.internal:8080/api/goa-user/oauth2/token
     networks:
       - goa
     extra_hosts:
