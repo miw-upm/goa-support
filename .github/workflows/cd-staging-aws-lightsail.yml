@@ -57,9 +57,10 @@ jobs:
             docker run -d \
               --name ${{ env.ARTIFACT }} \
               --restart always \
-              --network goa \
               --memory 512m \
               --memory-swap 1024m \
+              --network goa \
+              -e SPRING_PROFILES_ACTIVE=prod \
               -e BASE_URL="https://goa.miwupm.es" \
               -e MAIL_PASSWORD="${{ secrets.GMAIL_APP_PASSWORD }}" \
               -e API_CLIENT_ID="${{ secrets.API_CLIENT_ID }}" \
