@@ -1,12 +1,22 @@
+logging:
+  level:
+    root: WARN
+    es.upm.api: INFO
+
 spring:
   security:
     oauth2:
-      jwk-uri: ${HOST}/api/goa-user/oauth2/jwks
-      token-uri: ${HOST}/api/goa-user/oauth2/token
-      api-client-id: ${API_CLIENT_ID}
-      api-client-secret: ${API_CLIENT_SECRET}
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${BASE_URL}/api/goa-user/oauth2/jwks
   mail:
     password: ${MAIL_PASSWORD}
+
+app:
+  oauth2:
+    token-uri: ${BASE_URL}/api/goa-user/oauth2/token
+    api-client-id: ${API_CLIENT_ID}
+    api-client-secret: ${API_CLIENT_SECRET}
 
 eureka:
   client:
