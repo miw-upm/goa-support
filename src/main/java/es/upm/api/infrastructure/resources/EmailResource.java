@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@PreAuthorize(Security.ADMIN_MANAGER_OPERATOR)
+@PreAuthorize(Security.ADMIN_MANAGER_OPERATOR_URL_TOKEN)
 @RequestMapping(EmailResource.EMAILS)
 public class EmailResource {
     public static final String EMAILS = "/emails";
