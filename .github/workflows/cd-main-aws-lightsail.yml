@@ -62,7 +62,10 @@ jobs:
               --network goa \
               -e SPRING_PROFILES_ACTIVE=prod \
               -e BASE_URL="https://goa.miwupm.es" \
-              -e MAIL_PASSWORD="${{ secrets.GMAIL_APP_PASSWORD }}" \
+              -e MAIL_HOST="${{ secrets.MAIL_SES_HOST }}" \
+              -e MAIL_USERNAME="${{ secrets.MAIL_SES_USERNAME }}" \
+              -e MAIL_PASSWORD="${{ secrets.MAIL_SES_PASSWORD }}" \
+              -e MAIL_FROM="${{ secrets.MAIL_FROM }}" \
               -e API_CLIENT_ID="${{ secrets.API_CLIENT_ID }}" \
               -e API_CLIENT_SECRET="${{ secrets.API_CLIENT_SECRET }}" \
               ghcr.io/${{ env.REPOSITORY }}:latest

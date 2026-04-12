@@ -25,7 +25,7 @@ spring:
         jwt:
           jwk-set-uri: ${BASE_URL:http://localhost:8080}/api/goa-user/oauth2/jwks
   mail:
-    host: smtp.gmail.com
+    host: ${MAIL_HOST:smtp.gmail.com}
     port: 587
     username: ${MAIL_USERNAME:noreply.miwupm@gmail.com}
     password: ${MAIL_PASSWORD:aaaa bbbb cccc dddd}
