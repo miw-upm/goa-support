@@ -47,9 +47,9 @@ jobs:
       - name: 🚀 Deploy on AWS Lightsail
         uses: appleboy/ssh-action@v1.2.1
         with:
-          host: ${{ secrets.AWS_LIGHTSAIL_IP_STAGING }}
-          username: ${{ secrets.AWS_LIGHTSAIL_USER_STAGING }}
-          key: ${{ secrets.AWS_LIGHTSAIL_SSH_KEY_STAGING }}
+          host: ${{ secrets.AWS_LIGHTSAIL_IP_MAIN }}
+          username: ${{ secrets.AWS_LIGHTSAIL_USER_MAIN }}
+          key: ${{ secrets.AWS_LIGHTSAIL_SSH_KEY_MAIN }}
           script: |
             echo ${{ secrets.GHCR_PERSONAL_ACCESS_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker rm -f ${{ env.ARTIFACT }} || true
@@ -61,7 +61,7 @@ jobs:
               --memory-swap 1024m \
               --network goa \
               -e SPRING_PROFILES_ACTIVE=prod \
-              -e BASE_URL="https://goa.miwupm.es" \
+              -e BASE_URL="https://gestion.ocanabogados.es" \
               -e MAIL_HOST="${{ secrets.MAIL_SES_HOST }}" \
               -e MAIL_USERNAME="${{ secrets.MAIL_SES_USERNAME }}" \
               -e MAIL_PASSWORD="${{ secrets.MAIL_SES_PASSWORD }}" \
