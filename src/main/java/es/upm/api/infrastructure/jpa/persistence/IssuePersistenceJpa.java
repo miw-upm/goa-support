@@ -6,6 +6,7 @@ import es.upm.api.infrastructure.jpa.entities.Status;
 import es.upm.api.infrastructure.jpa.repositories.IssueRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -30,6 +31,7 @@ public class IssuePersistenceJpa implements IssuePersistence {
     public void updateStatus(UUID id, Status status) {
         issueJpaRepository.findById(id).ifPresent(issueDb -> {
             issueDb.setStatus(status);
+            issueDb.setLastUpdateAt(java.time.LocalDateTime.now());
             issueJpaRepository.save(issueDb);
         });
     }
@@ -39,5 +41,10 @@ public class IssuePersistenceJpa implements IssuePersistence {
         if (issueJpaRepository.existsById(id)) {
             issueJpaRepository.deleteById(id);
         }
+    }
+
+    @Override
+    public List<Issue> readAll() {
+        return issueJpaRepository.findAll();
     }
 }

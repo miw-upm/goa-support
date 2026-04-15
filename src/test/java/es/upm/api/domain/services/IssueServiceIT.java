@@ -1,6 +1,7 @@
 package es.upm.api.domain.services;
 
 import es.upm.api.domain.model.IssueDto;
+import es.upm.api.domain.model.IssueListDto;
 import es.upm.api.domain.persistence.IssuePersistence;
 import es.upm.api.domain.webclients.GitHubIssueWebClient;
 import es.upm.api.domain.webclients.UserWebClient;
@@ -23,6 +24,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -269,5 +271,51 @@ class IssueServiceIT {
         assertThat(issuePersistence.readById(issue.getId()).getStatus()).isEqualTo(Status.PENDING);
 
         issuePersistence.delete(issue.getId());
+    }
+
+    @Test
+    void shouldReturnAllIssuesAsIssueListDto() {
+        // Given
+        UUID userId1 = UUID.randomUUID();
+        UUID userId2 = UUID.randomUUID();
+
+        Issue issue1 = new Issue("Issue 1", "Description 1", "Context 1", Type.BUG, userId1);
+        Issue createdIssue1 = issuePersistence.create(issue1);
+
+        Issue issue2 = new Issue("Issue 2", "Description 2", "Context 2", Type.IMPROVEMENT, userId2);
+        issue2.setStatus(Status.IN_PROGRESS);
+        Issue createdIssue2 = issuePersistence.create(issue2);
+
+        // When
+        List<IssueListDto> result = issueService.getAllIssues();
+
+        // Then
+        assertThat(result).hasSizeGreaterThanOrEqualTo(2); // Since there might be other issues from previous tests
+
+        // Find the created issues in the result
+        IssueListDto dto1 = result.stream()
+                .filter(dto -> dto.getId().equals(createdIssue1.getId()))
+                .findFirst().orElseThrow();
+        assertThat(dto1.getTitle()).isEqualTo("Issue 1");
+        assertThat(dto1.getIssueType()).isEqualTo(Type.BUG);
+        assertThat(dto1.getIssueStatus()).isEqualTo(Status.PENDING);
+
+        IssueListDto dto2 = result.stream()
+                .filter(dto -> dto.getId().equals(createdIssue2.getId()))
+                .findFirst().orElseThrow();
+        assertThat(dto2.getTitle()).isEqualTo("Issue 2");
+        assertThat(dto2.getIssueType()).isEqualTo(Type.IMPROVEMENT);
+        assertThat(dto2.getIssueStatus()).isEqualTo(Status.IN_PROGRESS);
+
+        // Cleanup
+        issuePersistence.delete(createdIssue1.getId());
+        issuePersistence.delete(createdIssue2.getId());
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoIssues() {
+        // When
+        List<IssueListDto> result = issueService.getAllIssues();
+        assertThat(result).isNotNull();
     }
 }

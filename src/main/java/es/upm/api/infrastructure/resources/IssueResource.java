@@ -1,6 +1,7 @@
 package es.upm.api.infrastructure.resources;
 
 import es.upm.api.domain.model.IssueDto;
+import es.upm.api.domain.model.IssueListDto;
 import es.upm.api.domain.services.IssueService;
 import es.upm.api.infrastructure.resources.requests.CreateIssueRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -40,6 +42,14 @@ public class IssueResource {
     @Operation(summary = "Sync issue status with GitHub", description = "Synchronizes issue status based on associated GitHub issue state")
     public ResponseEntity<IssueDto> syncIssueStatus(@PathVariable UUID id) {
         return ResponseEntity.ok(issueService.syncIssueStatus(id));
+    }
+
+    @GetMapping
+    @Operation(summary = "List all issues", description = "Retrieves a list of all issues")
+    public ResponseEntity<List<IssueListDto>> listIssues() {
+        List<IssueListDto> issues;
+        issues = issueService.getAllIssues();
+        return ResponseEntity.ok(issues);
     }
 }
 
