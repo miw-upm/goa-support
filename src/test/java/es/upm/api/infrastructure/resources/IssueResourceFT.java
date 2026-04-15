@@ -2,6 +2,7 @@ package es.upm.api.infrastructure.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.upm.api.domain.model.IssueDto;
+import es.upm.api.domain.model.IssueListDto;
 import es.upm.api.domain.exceptions.NotFoundException;
 import es.upm.api.domain.model.UserDto;
 import es.upm.api.domain.services.IssueService;
@@ -20,6 +21,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.Mockito.when;
@@ -156,5 +158,49 @@ class IssueResourceFT {
 
         mockMvc.perform(get(IssueResource.ISSUES + "/{id}", issueId))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser
+    void shouldListAllIssues() throws Exception {
+        IssueListDto issue1 = new IssueListDto();
+        issue1.setId(UUID.randomUUID());
+        issue1.setTitle("Bug Issue");
+        issue1.setIssueType(Type.BUG);
+        issue1.setIssueStatus(Status.IN_PROGRESS);
+        issue1.setCreatedAt(java.time.LocalDateTime.now());
+
+        IssueListDto issue2 = new IssueListDto();
+        issue2.setId(UUID.randomUUID());
+        issue2.setTitle("Feature Issue");
+        issue2.setIssueType(Type.IMPROVEMENT);
+        issue2.setIssueStatus(Status.PENDING);
+        issue2.setCreatedAt(java.time.LocalDateTime.now());
+
+        List<IssueListDto> issues = List.of(issue1, issue2);
+
+        when(issueService.getAllIssues()).thenReturn(issues);
+
+        mockMvc.perform(get(IssueResource.ISSUES))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].title").value("Bug Issue"))
+                .andExpect(jsonPath("$[0].issueType").value("BUG"))
+                .andExpect(jsonPath("$[0].issueStatus").value("IN_PROGRESS"))
+                .andExpect(jsonPath("$[1].title").value("Feature Issue"))
+                .andExpect(jsonPath("$[1].issueType").value("IMPROVEMENT"))
+                .andExpect(jsonPath("$[1].issueStatus").value("PENDING"));
+    }
+
+    @Test
+    @WithMockUser
+    void shouldListEmptyIssuesWhenNoIssuesExist() throws Exception {
+        when(issueService.getAllIssues()).thenReturn(List.of());
+
+        mockMvc.perform(get(IssueResource.ISSUES))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(0));
     }
 }
