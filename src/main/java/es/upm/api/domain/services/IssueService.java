@@ -2,16 +2,19 @@ package es.upm.api.domain.services;
 
 import es.upm.api.domain.exceptions.NotFoundException;
 import es.upm.api.domain.model.IssueDto;
+import es.upm.api.domain.model.IssueListDto;
 import es.upm.api.domain.persistence.IssuePersistence;
 import es.upm.api.domain.webclients.GitHubIssueWebClient;
 import es.upm.api.domain.webclients.UserWebClient;
 import es.upm.api.infrastructure.jpa.entities.Issue;
 import es.upm.api.infrastructure.jpa.entities.Status;
+import es.upm.api.infrastructure.jpa.entities.Type;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -72,6 +75,12 @@ public class IssueService {
         }
 
         return new IssueDto(issue);
+    }
+
+    public List<IssueListDto> getAllIssues() {
+        return issuePersistence.readAll().stream()
+                .map(IssueListDto::new)
+                .toList();
     }
 
     private UUID getUserIdFromAuthentication() {
