@@ -41,6 +41,19 @@ public class IssueService {
                 issueDto.getType(),
                 userId
         );
+
+        GitHubIssueWebClient.GitHubIssueResponse gitHubResponse = gitHubIssueWebClient.createIssue(
+                issueDto.getTitle(),
+                issueDto.getDescription(),
+                List.of(issueDto.getType().name())
+        );
+
+        String githubIssueId = String.valueOf(gitHubResponse.number());
+        String githubIssueUrl = gitHubResponse.html_url();
+
+        issue.setGithubIssueId(githubIssueId);
+        issue.setGithubIssueUrl(githubIssueUrl);
+
         return new IssueDto(issuePersistence.create(issue));
     }
 
