@@ -13,6 +13,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
+import es.upm.api.infrastructure.jpa.entities.Type;
+
 @RestController
 @RequestMapping(IssueResource.ISSUES)
 @Tag(name = "Issues", description = "API for managing issues")
@@ -45,11 +47,19 @@ public class IssueResource {
     }
 
     @GetMapping
-    @Operation(summary = "List all issues", description = "Retrieves a list of all issues")
-    public ResponseEntity<List<IssueListDto>> listIssues() {
+    @Operation(summary = "List issues", description = "Retrieves a list of issues, optionally filtered by type")
+    public ResponseEntity<List<IssueListDto>> listIssues(@RequestParam(required = false) String type) {
         List<IssueListDto> issues;
-        issues = issueService.getAllIssues();
+        if (type != null && !type.isEmpty()) {
+            try {
+                Type issueType = Type.valueOf(type.toUpperCase());
+                issues = issueService.getIssuesByType(issueType);
+            } catch (IllegalArgumentException e) {
+                issues = issueService.getAllIssues();
+            }
+        } else {
+            issues = issueService.getAllIssues();
+        }
         return ResponseEntity.ok(issues);
     }
 }
-
