@@ -22,6 +22,12 @@ jobs:
           java-version: 21
           cache: maven
 
+      - name: ⚙️ Configure Maven settings for GitHub Packages
+        uses: s4u/maven-settings-action@v3.0.0
+        with:
+          servers: |
+            [{"id": "github", "username": "${{ github.actor }}", "password": "${{ secrets.GITHUB_TOKEN }}"}]
+
       - name: 🏷️ Prepare container image metadata (repository in lowercase, artifact, version...)
         run: |
           echo "REPOSITORY=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
@@ -40,6 +46,7 @@ jobs:
         with:
           context: .
           push: true
+          build-args: GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
           tags: |
             ghcr.io/${{ env.REPOSITORY }}:${{ env.VERSION }}
             ghcr.io/${{ env.REPOSITORY }}:latest
@@ -52,6 +59,7 @@ jobs:
           key: ${{ secrets.AWS_LIGHTSAIL_SSH_KEY_MAIN }}
           script: |
             echo ${{ secrets.GHCR_PERSONAL_ACCESS_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
             docker rm -f ${{ env.ARTIFACT }} || true
             docker pull ghcr.io/${{ env.REPOSITORY }}:latest
             docker run -d \
@@ -69,5 +77,13 @@ jobs:
               -e API_CLIENT_ID="${{ secrets.API_CLIENT_ID }}" \
               -e API_CLIENT_SECRET="${{ secrets.API_CLIENT_SECRET }}" \
               ghcr.io/${{ env.REPOSITORY }}:latest
-            sleep 20
+
+            for i in $(seq 1 6); do  # 1 minutos
+              sleep 10
+              STATUS=$(docker inspect --format='{{.State.Health.Status}}' ${{ env.ARTIFACT }} 2>/dev/null)
+              echo "Intento $i: $STATUS"
+              [ "$STATUS" = "healthy" ] && break
+            done
+            
             docker image prune --filter "until=12h" -f
+            

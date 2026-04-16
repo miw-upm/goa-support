@@ -1,25 +1,29 @@
 services:
   goa-support:
-    build: .
+    build:
+      context: .
+      secrets: [ github_token ]
     image: goa-support:latest
     restart: always
-    ports:
-      - "8084:8084"
+    ports: ["8084:8084"]
     environment:
       JAVA_OPTS: "-Xms64m -Xmx384m"
-      mem_limit: 512m
       EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE: http://host.docker.internal:8761/eureka/
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://host.docker.internal:8080/api/goa-user/oauth2/jwks
       APP_OAUTH2_TOKEN_URI: http://host.docker.internal:8080/api/goa-user/oauth2/token
-    networks:
-      - goa
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
+    networks: [goa]
+    extra_hosts: ["host.docker.internal:host-gateway"]
 
 networks:
   goa:
     external: true
+
+secrets:
+  github_token:
+    environment: GITHUB_TOKEN
+
+#> $env:GITHUB_TOKEN="xxxx"   echo $env:GITHUB_TOKEN
+#> export GITHUB_TOKEN=xxxx
 
 #> docker compose up --build -d
 #> docker compose up --build -d --scale goa-support=2
