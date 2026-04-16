@@ -280,7 +280,6 @@ class IssueServiceIT {
 
     @Test
     void shouldReturnAllIssuesAsIssueListDto() {
-        // Given
         UUID userId1 = UUID.randomUUID();
         UUID userId2 = UUID.randomUUID();
 
@@ -291,13 +290,10 @@ class IssueServiceIT {
         issue2.setStatus(Status.IN_PROGRESS);
         Issue createdIssue2 = issuePersistence.create(issue2);
 
-        // When
         List<IssueListDto> result = issueService.getAllIssues();
 
-        // Then
-        assertThat(result).hasSizeGreaterThanOrEqualTo(2); // Since there might be other issues from previous tests
+        assertThat(result).hasSizeGreaterThanOrEqualTo(2);
 
-        // Find the created issues in the result
         IssueListDto dto1 = result.stream()
                 .filter(dto -> dto.getId().equals(createdIssue1.getId()))
                 .findFirst().orElseThrow();
@@ -312,15 +308,38 @@ class IssueServiceIT {
         assertThat(dto2.getIssueType()).isEqualTo(Type.IMPROVEMENT);
         assertThat(dto2.getIssueStatus()).isEqualTo(Status.IN_PROGRESS);
 
-        // Cleanup
         issuePersistence.delete(createdIssue1.getId());
         issuePersistence.delete(createdIssue2.getId());
     }
 
     @Test
     void shouldReturnEmptyListWhenNoIssues() {
-        // When
         List<IssueListDto> result = issueService.getAllIssues();
         assertThat(result).isNotNull();
+    }
+
+    @Test
+    void shouldReturnIssuesFilteredByType() {
+        UUID userId1 = UUID.randomUUID();
+        UUID userId2 = UUID.randomUUID();
+
+        Issue issue1 = new Issue("Issue 1", "Description 1", "Context 1", Type.BUG, userId1);
+        Issue createdIssue1 = issuePersistence.create(issue1);
+
+        Issue issue2 = new Issue("Issue 2", "Description 2", "Context 2", Type.IMPROVEMENT, userId2);
+        Issue createdIssue2 = issuePersistence.create(issue2);
+
+        Issue issue3 = new Issue("Issue 3", "Description 3", "Context 3", Type.BUG, userId1);
+        Issue createdIssue3 = issuePersistence.create(issue3);
+
+        List<IssueListDto> result = issueService.getIssuesByType(Type.BUG);
+
+        assertThat(result).hasSizeGreaterThanOrEqualTo(2);
+        assertThat(result.stream().map(IssueListDto::getId))
+                .contains(createdIssue1.getId(), createdIssue3.getId());
+
+        issuePersistence.delete(createdIssue1.getId());
+        issuePersistence.delete(createdIssue2.getId());
+        issuePersistence.delete(createdIssue3.getId());
     }
 }

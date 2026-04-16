@@ -3,6 +3,7 @@ package es.upm.api.infrastructure.jpa.persistence;
 import es.upm.api.domain.persistence.IssuePersistence;
 import es.upm.api.infrastructure.jpa.entities.Issue;
 import es.upm.api.infrastructure.jpa.entities.Status;
+import es.upm.api.infrastructure.jpa.entities.Type;
 import es.upm.api.infrastructure.jpa.repositories.IssueRepository;
 import org.springframework.stereotype.Repository;
 
@@ -46,5 +47,10 @@ public class IssuePersistenceJpa implements IssuePersistence {
     @Override
     public List<Issue> readAll() {
         return issueJpaRepository.findAll();
+    }
+
+    @Override
+    public List<Issue> readByType(Type type) {
+        return issueJpaRepository.findByType(type);
     }
 }

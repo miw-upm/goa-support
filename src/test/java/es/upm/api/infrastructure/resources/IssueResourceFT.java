@@ -203,4 +203,36 @@ class IssueResourceFT {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(0));
     }
+
+    @Test
+    @WithMockUser
+    void shouldListIssuesByType() throws Exception {
+        IssueListDto issue1 = new IssueListDto();
+        issue1.setId(UUID.randomUUID());
+        issue1.setTitle("Bug 1");
+        issue1.setIssueType(Type.BUG);
+        issue1.setIssueStatus(Status.PENDING);
+        issue1.setCreatedAt(java.time.LocalDateTime.now());
+
+        IssueListDto issue2 = new IssueListDto();
+        issue2.setId(UUID.randomUUID());
+        issue2.setTitle("Bug 2");
+        issue2.setIssueType(Type.BUG);
+        issue2.setIssueStatus(Status.IN_PROGRESS);
+        issue2.setCreatedAt(java.time.LocalDateTime.now());
+
+        List<IssueListDto> issues = List.of(issue1, issue2);
+
+        when(issueService.getIssuesByType(Type.BUG)).thenReturn(issues);
+
+        mockMvc.perform(get(IssueResource.ISSUES)
+                        .param("type", "BUG"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].title").value("Bug 1"))
+                .andExpect(jsonPath("$[0].issueType").value("BUG"))
+                .andExpect(jsonPath("$[1].title").value("Bug 2"))
+                .andExpect(jsonPath("$[1].issueType").value("BUG"));
+    }
 }

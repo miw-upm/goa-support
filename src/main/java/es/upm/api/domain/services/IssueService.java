@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -86,12 +87,18 @@ public class IssueService {
         } else if (gitHubIssueState == GitHubIssueWebClient.GitHubIssueState.CLOSED) {
             issuePersistence.updateStatus(issue.getId(), Status.FINISHED);
         }
-
         return new IssueDto(issue);
     }
 
     public List<IssueListDto> getAllIssues() {
         return issuePersistence.readAll().stream()
+                .map(IssueListDto::new)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<IssueListDto> getIssuesByType(Type type) {
+        return issuePersistence.readByType(type).stream()
                 .map(IssueListDto::new)
                 .toList();
     }
