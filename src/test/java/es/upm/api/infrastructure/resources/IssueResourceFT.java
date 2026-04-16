@@ -235,4 +235,66 @@ class IssueResourceFT {
                 .andExpect(jsonPath("$[1].title").value("Bug 2"))
                 .andExpect(jsonPath("$[1].issueType").value("BUG"));
     }
+
+    @Test
+    @WithMockUser
+    void shouldListIssuesByStatus() throws Exception {
+        IssueListDto issue1 = new IssueListDto();
+        issue1.setId(UUID.randomUUID());
+        issue1.setTitle("Bug 1");
+        issue1.setIssueType(Type.BUG);
+        issue1.setIssueStatus(Status.PENDING);
+        issue1.setCreatedAt(java.time.LocalDateTime.now());
+
+        IssueListDto issue2 = new IssueListDto();
+        issue2.setId(UUID.randomUUID());
+        issue2.setTitle("Bug 2");
+        issue2.setIssueType(Type.BUG);
+        issue2.setIssueStatus(Status.IN_PROGRESS);
+        issue2.setCreatedAt(java.time.LocalDateTime.now());
+
+        List<IssueListDto> issues = List.of(issue2);
+
+        when(issueService.getIssuesByStatus(Status.IN_PROGRESS)).thenReturn(issues);
+
+        mockMvc.perform(get(IssueResource.ISSUES)
+                        .param("status", "IN_PROGRESS"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].title").value("Bug 2"))
+                .andExpect(jsonPath("$[0].issueStatus").value("IN_PROGRESS"));
+    }
+
+    @Test
+    @WithMockUser
+    void shouldListIssuesByTypeAndStatus() throws Exception {
+        IssueListDto issue1 = new IssueListDto();
+        issue1.setId(UUID.randomUUID());
+        issue1.setTitle("Bug 1");
+        issue1.setIssueType(Type.BUG);
+        issue1.setIssueStatus(Status.PENDING);
+        issue1.setCreatedAt(java.time.LocalDateTime.now());
+
+        IssueListDto issue2 = new IssueListDto();
+        issue2.setId(UUID.randomUUID());
+        issue2.setTitle("Bug 2");
+        issue2.setIssueType(Type.BUG);
+        issue2.setIssueStatus(Status.IN_PROGRESS);
+        issue2.setCreatedAt(java.time.LocalDateTime.now());
+
+        List<IssueListDto> issues = List.of(issue1);
+
+        when(issueService.getIssuesByTypeAndStatus(Type.BUG, Status.PENDING)).thenReturn(issues);
+
+        mockMvc.perform(get(IssueResource.ISSUES)
+                        .param("type", "BUG")
+                        .param("status", "PENDING"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].title").value("Bug 1"))
+                .andExpect(jsonPath("$[0].issueType").value("BUG"))
+                .andExpect(jsonPath("$[0].issueStatus").value("PENDING"));
+    }
 }
