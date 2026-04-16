@@ -14,6 +14,9 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
@@ -187,5 +190,120 @@ class GitHubIssueWebClientIT {
                 .isEqualTo(GitHubIssueWebClient.GitHubIssueState.OPEN);
         assertThat(GitHubIssueWebClient.GitHubIssueState.fromGitHubState("cLoSeD"))
                 .isEqualTo(GitHubIssueWebClient.GitHubIssueState.CLOSED);
+    }
+
+    @Test
+    void shouldCreateGitHubIssueSuccessfully() {
+        GitHubIssueWebClient client = new GitHubIssueWebClient("https://api.github.com", "token-123", "acme", "support");
+        RestTemplate restTemplate = (RestTemplate) ReflectionTestUtils.getField(client, "restTemplate");
+        MockRestServiceServer server = MockRestServiceServer.bindTo(restTemplate).build();
+
+        server.expect(requestTo("https://api.github.com/repos/acme/support/issues"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header(HttpHeaders.AUTHORIZATION, "Bearer token-123"))
+                .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andRespond(withSuccess("{\"state\":\"open\",\"html_url\":\"https://github.com/acme/support/issues/123\",\"number\":123}", MediaType.APPLICATION_JSON));
+
+        GitHubIssueWebClient.GitHubIssueResponse result = client.createIssue("Test Issue", "Description", List.of("bug"));
+
+        assertThat(result.state()).isEqualTo("open");
+        assertThat(result.html_url()).isEqualTo("https://github.com/acme/support/issues/123");
+        assertThat(result.number()).isEqualTo(123);
+        server.verify();
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenRepositoryNotConfigured() {
+        GitHubIssueWebClient client = new GitHubIssueWebClient("https://api.github.com", "token", "", "");
+
+        assertThatThrownBy(() -> client.createIssue("Title", "Body", List.of()))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Repository owner and name must be set");
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenTitleIsEmpty() {
+        GitHubIssueWebClient client = new GitHubIssueWebClient("https://api.github.com", "token", "acme", "support");
+
+        assertThatThrownBy(() -> client.createIssue("", "Body", List.of()))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Issue title must not be empty");
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenTokenNotProvided() {
+        GitHubIssueWebClient client = new GitHubIssueWebClient("https://api.github.com", "", "acme", "support");
+
+        assertThatThrownBy(() -> client.createIssue("Title", "Body", List.of()))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("GitHub token must be provided");
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenGitHubReturnsBadRequest() {
+        GitHubIssueWebClient client = new GitHubIssueWebClient("https://api.github.com", "token", "acme", "support");
+        RestTemplate restTemplate = (RestTemplate) ReflectionTestUtils.getField(client, "restTemplate");
+        MockRestServiceServer server = MockRestServiceServer.bindTo(restTemplate).build();
+
+        server.expect(requestTo("https://api.github.com/repos/acme/support/issues"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withStatus(org.springframework.http.HttpStatus.BAD_REQUEST).body("Invalid request"));
+
+        assertThatThrownBy(() -> client.createIssue("Title", "Body", List.of()))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Invalid request to GitHub");
+
+        server.verify();
+    }
+
+    @Test
+    void shouldThrowBadGatewayWhenGitHubReturnsForbidden() {
+        GitHubIssueWebClient client = new GitHubIssueWebClient("https://api.github.com", "token", "acme", "support");
+        RestTemplate restTemplate = (RestTemplate) ReflectionTestUtils.getField(client, "restTemplate");
+        MockRestServiceServer server = MockRestServiceServer.bindTo(restTemplate).build();
+
+        server.expect(requestTo("https://api.github.com/repos/acme/support/issues"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withStatus(org.springframework.http.HttpStatus.FORBIDDEN).body("Forbidden"));
+
+        assertThatThrownBy(() -> client.createIssue("Title", "Body", List.of()))
+                .isInstanceOf(BadGatewayException.class)
+                .hasMessageContaining("GitHub API access forbidden");
+
+        server.verify();
+    }
+
+    @Test
+    void shouldThrowBadGatewayWhenGitHubCallFailsForCreate() {
+        GitHubIssueWebClient client = new GitHubIssueWebClient("https://api.github.com", "token", "acme", "support");
+        RestTemplate restTemplate = (RestTemplate) ReflectionTestUtils.getField(client, "restTemplate");
+        MockRestServiceServer server = MockRestServiceServer.bindTo(restTemplate).build();
+
+        server.expect(requestTo("https://api.github.com/repos/acme/support/issues"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR));
+
+        assertThatThrownBy(() -> client.createIssue("Title", "Body", List.of()))
+                .isInstanceOf(BadGatewayException.class)
+                .hasMessageContaining("Error creating GitHub issue");
+
+        server.verify();
+    }
+
+    @Test
+    void shouldThrowBadGatewayWhenGitHubReturnsNoBodyForCreate() {
+        GitHubIssueWebClient client = new GitHubIssueWebClient("https://api.github.com", "token", "acme", "support");
+        RestTemplate restTemplate = (RestTemplate) ReflectionTestUtils.getField(client, "restTemplate");
+        MockRestServiceServer server = MockRestServiceServer.bindTo(restTemplate).build();
+
+        server.expect(requestTo("https://api.github.com/repos/acme/support/issues"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withNoContent());
+
+        assertThatThrownBy(() -> client.createIssue("Title", "Body", List.of()))
+                .isInstanceOf(BadGatewayException.class)
+                .hasMessageContaining("GitHub response does not include created issue data");
+
+        server.verify();
     }
 }

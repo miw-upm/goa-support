@@ -115,7 +115,7 @@ public class GitHubIssueWebClient {
         }
     }
 
-    private record GitHubIssueResponse(String state) {
+    public record GitHubIssueResponse(String state, String html_url, int number) {
     }
 
     private record GitHubIssueLocation(String owner, String repository, String issueNumber) {
@@ -131,6 +131,59 @@ public class GitHubIssueWebClient {
                 case "closed" -> CLOSED;
                 default -> throw new BadGatewayException("Unsupported GitHub issue state: " + gitHubState);
             };
+        }
+    }
+
+    private record CreateGitHubIssueRequest(String title, String body, List<String> labels) {
+    }
+    /**
+     * Creates a new GitHub issue in the configured repository.
+     * @param title The issue title (required)
+     * @param body The issue body/description (optional)
+     * @param labels The list of labels (optional)
+     * @return GitHubIssueResponse with state, html_url, and number
+     */
+    public GitHubIssueResponse createIssue(String title, String body, List<String> labels) {
+        if (!StringUtils.hasText(this.repositoryOwner) || !StringUtils.hasText(this.repositoryName)) {
+            throw new BadRequestException("Repository owner and name must be set to create an issue");
+        }
+        if (!StringUtils.hasText(title)) {
+            throw new BadRequestException("Issue title must not be empty");
+        }
+
+        String endpoint = this.apiUrl + "/repos/" + this.repositoryOwner + "/" + this.repositoryName + "/issues";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("X-GitHub-Api-Version", "2022-11-28");
+        if (StringUtils.hasText(this.token)) {
+            headers.setBearerAuth(this.token);
+        } else {
+            throw new BadRequestException("GitHub token must be provided to create an issue");
+        }
+
+        CreateGitHubIssueRequest request = new CreateGitHubIssueRequest(title, body, labels);
+
+        try {
+            ResponseEntity<GitHubIssueResponse> response = this.restTemplate.exchange(
+                    endpoint,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request, headers),
+                    GitHubIssueResponse.class
+            );
+
+            if (response.getBody() == null) {
+                throw new BadGatewayException("GitHub response does not include created issue data");
+            }
+
+            return response.getBody();
+        } catch (HttpClientErrorException.BadRequest exception) {
+            throw new BadRequestException("Invalid request to GitHub: " + exception.getMessage());
+        } catch (HttpClientErrorException.Forbidden exception) {
+            throw new BadGatewayException("GitHub API access forbidden: " + exception.getMessage());
+        } catch (RestClientException exception) {
+            throw new BadGatewayException("Error creating GitHub issue");
         }
     }
 }

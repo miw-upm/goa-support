@@ -79,6 +79,9 @@ class IssueServiceIT {
         when(userWebClient.readUserByMobile("mobile-user"))
                 .thenReturn(userResponse);
 
+        when(gitHubIssueWebClient.createIssue(anyString(), anyString(), anyList()))
+                .thenReturn(new GitHubIssueWebClient.GitHubIssueResponse("open", "https://github.com/test-owner/test-repo/issues/123", 123));
+
         CreateIssueRequest request = new CreateIssueRequest();
         request.setTitle("Test Issue");
         request.setDescription("Description");
@@ -93,6 +96,8 @@ class IssueServiceIT {
 
         assertThat(persisted.getCreatedByUserId()).isEqualTo(userId);
         assertThat(persisted.getTitle()).isEqualTo("Test Issue");
+        assertThat(persisted.getGithubIssueId()).isEqualTo("123");
+        assertThat(persisted.getGithubIssueUrl()).isEqualTo("https://github.com/test-owner/test-repo/issues/123");
 
         issuePersistence.delete(persisted.getId());
     }
