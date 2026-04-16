@@ -16,4 +16,7 @@ public interface IssuePersistence {
     void delete(UUID id);
     List<Issue> readAll();
     List<Issue> readByType(Type type);
+    List<Issue> readByStatus(Status status);
+    List<Issue> readByTypeAndStatus(Type type, Status status);
+
 }

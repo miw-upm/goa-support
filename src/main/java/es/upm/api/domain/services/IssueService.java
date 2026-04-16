@@ -103,6 +103,20 @@ public class IssueService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<IssueListDto> getIssuesByStatus(Status status) {
+        return issuePersistence.readByStatus(status).stream()
+                .map(IssueListDto::new)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<IssueListDto> getIssuesByTypeAndStatus(Type type, Status status) {
+        return issuePersistence.readByTypeAndStatus(type, status).stream()
+                .map(IssueListDto::new)
+                .toList();
+    }
+
     private UUID getUserIdFromAuthentication() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {

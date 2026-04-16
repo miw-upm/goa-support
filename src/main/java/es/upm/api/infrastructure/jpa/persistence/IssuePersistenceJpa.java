@@ -53,4 +53,14 @@ public class IssuePersistenceJpa implements IssuePersistence {
     public List<Issue> readByType(Type type) {
         return issueJpaRepository.findByType(type);
     }
+
+    @Override
+    public List<Issue> readByStatus(Status status) {
+        return issueJpaRepository.findByStatus(status);
+    }
+
+    @Override
+    public List<Issue> readByTypeAndStatus(Type type, Status status) {
+        return issueJpaRepository.findByTypeAndStatus(type,status);
+    }
 }
