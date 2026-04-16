@@ -342,4 +342,46 @@ class IssueServiceIT {
         issuePersistence.delete(createdIssue2.getId());
         issuePersistence.delete(createdIssue3.getId());
     }
+
+    @Test
+    void shouldReturnIssuesFilteredByStatus() {
+        UUID userId1 = UUID.randomUUID();
+        UUID userId2 = UUID.randomUUID();
+
+        Issue issue1 = new Issue("Issue 1", "Description 1", "Context 1", Type.BUG, userId1);
+        Issue createdIssue1 = issuePersistence.create(issue1);
+
+        Issue issue2 = new Issue("Issue 2", "Description 2", "Context 2", Type.IMPROVEMENT, userId2);
+        Issue createdIssue2 = issuePersistence.create(issue2);
+
+        List<IssueListDto> result = issueService.getIssuesByStatus(Status.PENDING);
+
+        assertThat(result).hasSizeGreaterThanOrEqualTo(2);
+        assertThat(result.stream().map(IssueListDto::getId))
+                .contains(createdIssue1.getId(), createdIssue2.getId());
+
+        issuePersistence.delete(createdIssue1.getId());
+        issuePersistence.delete(createdIssue2.getId());
+    }
+
+    @Test
+    void shouldReturnIssuesFilteredByTypeAndStatus() {
+        UUID userId1 = UUID.randomUUID();
+        UUID userId2 = UUID.randomUUID();
+
+        Issue issue1 = new Issue("Issue 1", "Description 1", "Context 1", Type.BUG, userId1);
+        Issue createdIssue1 = issuePersistence.create(issue1);
+
+        Issue issue2 = new Issue("Issue 2", "Description 2", "Context 2", Type.IMPROVEMENT, userId2);
+        Issue createdIssue2 = issuePersistence.create(issue2);
+
+        List<IssueListDto> result = issueService.getIssuesByTypeAndStatus(Type.BUG, Status.PENDING);
+
+        assertThat(result).hasSizeGreaterThanOrEqualTo(1);
+        assertThat(result.stream().map(IssueListDto::getId))
+                .contains(createdIssue1.getId());
+
+        issuePersistence.delete(createdIssue1.getId());
+        issuePersistence.delete(createdIssue2.getId());
+    }
 }

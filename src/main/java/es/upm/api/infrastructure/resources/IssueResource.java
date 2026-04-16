@@ -3,6 +3,7 @@ package es.upm.api.infrastructure.resources;
 import es.upm.api.domain.model.IssueDto;
 import es.upm.api.domain.model.IssueListDto;
 import es.upm.api.domain.services.IssueService;
+import es.upm.api.infrastructure.jpa.entities.Status;
 import es.upm.api.infrastructure.resources.requests.CreateIssueRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,18 +49,34 @@ public class IssueResource {
 
     @GetMapping
     @Operation(summary = "List issues", description = "Retrieves a list of issues, optionally filtered by type")
-    public ResponseEntity<List<IssueListDto>> listIssues(@RequestParam(required = false) String type) {
+    public ResponseEntity<List<IssueListDto>> listIssues(
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String status) {
+
         List<IssueListDto> issues;
-        if (type != null && !type.isEmpty()) {
-            try {
+
+        try {
+            if (type != null && !type.isEmpty() && status != null && !status.isEmpty()) {
+                Type issueType = Type.valueOf(type.toUpperCase());
+                Status issueStatus = Status.valueOf(status.toUpperCase());
+                issues = issueService.getIssuesByTypeAndStatus(issueType, issueStatus);
+
+            } else if (type != null && !type.isEmpty()) {
                 Type issueType = Type.valueOf(type.toUpperCase());
                 issues = issueService.getIssuesByType(issueType);
-            } catch (IllegalArgumentException e) {
+
+            } else if (status != null && !status.isEmpty()) {
+                Status issueStatus = Status.valueOf(status.toUpperCase());
+                issues = issueService.getIssuesByStatus(issueStatus);
+
+            } else {
                 issues = issueService.getAllIssues();
             }
-        } else {
+
+        } catch (IllegalArgumentException e) {
             issues = issueService.getAllIssues();
         }
+
         return ResponseEntity.ok(issues);
     }
 }
