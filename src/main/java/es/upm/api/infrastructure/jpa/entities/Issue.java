@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Builder
@@ -51,10 +53,8 @@ public class Issue {
         this.technicalContext = technicalContext;
         this.type = type;
         this.status = Status.PENDING;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = ZonedDateTime.now(ZoneId.of("Europe/Madrid")).toLocalDateTime();
         this.createdByUserId = createdByUserId;
-        this.githubIssueId = null;
-        this.githubIssueUrl = null;
         this.lastUpdateAt = null;
     }
 }
