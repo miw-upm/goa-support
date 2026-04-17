@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Email {
     @NotBlank
+    @jakarta.validation.constraints.Email
     public String to;
     @NotBlank
     public String subject;
