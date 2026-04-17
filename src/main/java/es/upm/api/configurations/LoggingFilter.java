@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Log4j2
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@Profile({"dev"})
+//@Profile({"dev"})
 public class LoggingFilter extends OncePerRequestFilter {
 
 
