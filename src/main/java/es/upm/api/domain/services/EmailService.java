@@ -42,7 +42,7 @@ public class EmailService {
             helper.setText(email.getBody(), true);
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new BadGatewayException(e.getMessage());
+            throw new BadGatewayException("Error de host de email. " + e.getMessage());
         }
     }
 }
