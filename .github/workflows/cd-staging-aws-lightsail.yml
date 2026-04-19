@@ -22,7 +22,6 @@ jobs:
           java-version: 21
           cache: maven
 
-
       - name: ⚙️ Configure Maven settings for GitHub Packages
         uses: s4u/maven-settings-action@v3.0.0
         with:
@@ -47,8 +46,8 @@ jobs:
         with:
           context: .
           push: true
-          build-args: |
-            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          secrets: |
+            github_token=${{ secrets.GITHUB_TOKEN }}
           tags: |
             ghcr.io/${{ env.REPOSITORY }}:${{ env.VERSION }}
             ghcr.io/${{ env.REPOSITORY }}:latest
