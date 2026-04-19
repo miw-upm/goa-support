@@ -38,6 +38,8 @@ public class SystemResource {
     private String version;
     @Value("${info.app.build}")
     private String build;
+    @Value("${app.hosting}")
+    private String hosting;
 
     public String generateBadge(String label, String value) {
         int widthLabel = TEXT_MARGIN + CHARACTER_WIDTH * label.length();
@@ -58,7 +60,7 @@ public class SystemResource {
 
     @GetMapping(value = VERSION_BADGE, produces = {"image/svg+xml"})
     public byte[] generateBadge() {
-        return this.generateBadge("AWS", "v" + version).getBytes();
+        return this.generateBadge(hosting, "v" + version).getBytes();
     }
 
 }

@@ -5,7 +5,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 //@Profile({"dev"})
 public class LoggingFilter extends OncePerRequestFilter {
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -46,10 +44,24 @@ public class LoggingFilter extends OncePerRequestFilter {
         byte[] requestArray = wrappedRequest.getContentAsByteArray();
         String requestBody = new String(requestArray, wrappedRequest.getCharacterEncoding());
         log.debug("     Body (request): {}", requestBody);
-        byte[] responseArray = wrappedResponse.getContentAsByteArray();
-        String responseBody = new String(responseArray, response.getCharacterEncoding());
-        log.debug("     Body (response): {}", responseBody);
+        log.debug("     Body (response): {}", formatResponseBody(wrappedResponse));
         wrappedResponse.copyBodyToResponse();
     }
-}
 
+    private String formatResponseBody(ContentCachingResponseWrapper response) throws IOException {
+        String contentType = response.getContentType();
+        if (contentType == null) {
+            return new String(response.getContentAsByteArray(), response.getCharacterEncoding());
+        }
+        String baseType = contentType.split(";")[0].trim().toLowerCase();
+        String label = switch (baseType) {
+            case "application/pdf" -> "PDF";
+            case "text/html" -> "HTML";
+            case "text/css" -> "CSS";
+            default -> baseType.startsWith("image/") ? "Imagen " + baseType.substring(6).toUpperCase() : null;
+        };
+        return label != null
+                ? "[" + label + " - " + response.getContentSize() + " bytes]"
+                : new String(response.getContentAsByteArray(), response.getCharacterEncoding());
+    }
+}
