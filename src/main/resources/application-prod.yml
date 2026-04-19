@@ -13,6 +13,7 @@ spring:
     password: ${MAIL_PASSWORD}
 
 app:
+  hosting: AWS
   oauth2:
     token-uri: ${BASE_URL}/api/goa-user/oauth2/token
     api-client-id: ${API_CLIENT_ID}
