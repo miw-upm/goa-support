@@ -60,7 +60,7 @@ public class SystemResource {
 
     @GetMapping(value = VERSION_BADGE, produces = {"image/svg+xml"})
     public byte[] generateBadge() {
-        return this.generateBadge(hosting, "v" + version).getBytes();
+        return this.generateBadge(hosting + ": " + artifact, "v" + version).getBytes();
     }
 
 }
