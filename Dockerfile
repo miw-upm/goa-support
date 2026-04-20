@@ -1,22 +1,35 @@
-# Stage 1
+# ==== Stage 1: build ====
 FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
-COPY pom.xml ./
 
-RUN --mount=type=secret,id=github_token mkdir -p /root/.m2 && \
-    echo "<settings><servers><server><id>github</id><username>x</username>\
-<password>$(cat /run/secrets/github_token)</password></server></servers></settings>" \
-    > /root/.m2/settings.xml &&  mvn dependency:go-offline -B &&  rm -f /root/.m2/settings.xml
+RUN mkdir -p /root/.m2 && printf '%s\n' \
+  '<settings>' \
+  '  <servers>' \
+  '    <server>' \
+  '      <id>github</id>' \
+  '      <username>x</username>' \
+  '      <password>${env.GITHUB_TOKEN}</password>' \
+  '    </server>' \
+  '  </servers>' \
+  '</settings>' > /root/.m2/settings.xml
+
+COPY pom.xml ./
+RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN --mount=type=cache,target=/root/.m2/repository \
+    mvn -B dependency:go-offline
 
 COPY src ./src
-RUN mvn package -DskipTests && rm -f /root/.m2/settings.xml
+RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN --mount=type=cache,target=/root/.m2/repository \
+    mvn -B -DskipTests package && cp target/*.jar /app/app.jar
 
-# Stage 2
+# ==== Stage 2: runtime ====
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 RUN addgroup -S app && adduser -S app -G app
 COPY --from=build /app/target/*.jar app.jar
 USER app
+
+EXPOSE 8084
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
   CMD wget -qO- http://localhost:8084/actuator/health || exit 1
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]

@@ -24,6 +24,8 @@ secrets:
 
 #> $env:GITHUB_TOKEN="xxxx"   echo $env:GITHUB_TOKEN
 #> export GITHUB_TOKEN=xxxx
+# Para saber si el token esta habilitado
+#> curl.exe -H "Authorization: Bearer $env:GITHUB_TOKEN" https://api.github.com/user
 
 #> docker compose up --build -d
 #> docker compose up --build -d --scale goa-support=2
