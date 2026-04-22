@@ -1,4 +1,4 @@
-name: CD
+name: CD AWS Lightsail
 on:
   push:
     branches:
@@ -70,12 +70,12 @@ jobs:
               --network goa \
               -e SPRING_PROFILES_ACTIVE=prod \
               -e BASE_URL="https://gestion.ocanabogados.es" \
+              -e API_CLIENT_ID="${{ secrets.API_CLIENT_ID }}" \
+              -e API_CLIENT_SECRET="${{ secrets.API_CLIENT_SECRET }}" \
               -e MAIL_HOST="${{ secrets.MAIL_SES_HOST }}" \
               -e MAIL_USERNAME="${{ secrets.MAIL_SES_USERNAME }}" \
               -e MAIL_PASSWORD="${{ secrets.MAIL_SES_PASSWORD }}" \
               -e MAIL_FROM="${{ secrets.MAIL_FROM }}" \
-              -e API_CLIENT_ID="${{ secrets.API_CLIENT_ID }}" \
-              -e API_CLIENT_SECRET="${{ secrets.API_CLIENT_SECRET }}" \
               ghcr.io/${{ env.REPOSITORY }}:latest
 
             echo "⏳ Esperando a que se levante"          
@@ -94,4 +94,3 @@ jobs:
             
             echo "✅ Deploy exitoso"
             docker image prune --filter "until=12h" -f
-            

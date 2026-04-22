@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - develop
-      - develop2
       - release-*
 
 jobs:
@@ -68,4 +67,3 @@ jobs:
           -Dsonar.organization=${{ env.ORGANIZATION }}
           -Dsonar.host.url=https://sonarcloud.io 
           -Dsonar.token=${{ secrets.SONAR_TOKEN }}
-
