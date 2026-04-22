@@ -63,6 +63,7 @@ public class TokenManager {  //TODO utilizar el estandar y casi resuelve esta ge
     public synchronized void invalidateToken() {
         this.token = null;
         this.expiry = Instant.now();
+        this.obtainAccessToken();
     }
 
     public synchronized String getToken() {
