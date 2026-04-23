@@ -1,6 +1,7 @@
 package es.upm.api.domain.services;
 
 import es.upm.api.domain.model.Email;
+import es.upm.miw.exception.BadGatewayException;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,13 +66,16 @@ class EmailServiceTest {
     }
 
     @Test
-    void testSendSimpleThrowsException() {
-        doThrow(new MailSendException("Error SMTP"))
-                .when(mailSender).send(any(SimpleMailMessage.class));
-        Email email = Email.builder().to("to@example.com").subject("Asunto").body("Cuerpo").build();
+    void testSendHtmlWrapsMailExceptionAsBadGateway() {
+        MimeMessage mimeMessage = new MimeMessage((Session) null);
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        MailSendException smtpFailure = new MailSendException("Error SMTP");
+        doThrow(smtpFailure).when(mailSender).send(any(MimeMessage.class));
 
-        assertThatThrownBy(() -> emailService.sendSimple(email))
-                .isInstanceOf(MailSendException.class)
-                .hasMessageContaining("Error SMTP");
+        assertThatThrownBy(() -> emailService.sendHtml(
+                Email.builder().to("to@example.com").subject("Asunto HTML").body("<h1>Hola</h1>").build()))
+                .isInstanceOf(BadGatewayException.class)
+                .hasMessageContaining("Error enviando email HTML.")
+                .hasCause(smtpFailure);
     }
 }

@@ -20,12 +20,11 @@ public class FeignConfig {
     public RequestInterceptor requestInterceptor() {
         return template -> {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication instanceof JwtAuthenticationToken jwtAuth) {
+            if (authentication instanceof JwtAuthenticationToken jwtAuth && authentication.isAuthenticated()) {
                 String tokenValue = jwtAuth.getToken().getTokenValue();
                 template.header("Authorization", "Bearer " + tokenValue);
             } else {
-                String tokenValue = tokenManager.getToken();
-                template.header("Authorization", "Bearer " + tokenValue);
+                template.header("Authorization", "Bearer " + tokenManager.getToken());
             }
         };
     }
