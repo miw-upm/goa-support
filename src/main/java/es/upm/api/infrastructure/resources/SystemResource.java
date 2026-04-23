@@ -1,5 +1,6 @@
 package es.upm.api.infrastructure.resources;
 
+import es.upm.miw.badge.ApplicationInfoDto;
 import es.upm.miw.badge.VersionBadgeGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,10 +25,11 @@ public class SystemResource {
     private String hosting;
 
     @GetMapping
-    public String applicationInfo() {
-        return """
-                {"version":"%s::%s::%s"} (%s)
-                """.formatted(this.artifact, this.version, this.build, LocalDateTime.now());
+    public ApplicationInfoDto applicationInfo() {
+        return new ApplicationInfoDto(
+                "%s::%s::%s".formatted(artifact, version, build),
+                LocalDateTime.now()
+        );
     }
 
     @GetMapping(value = VERSION_BADGE, produces = {"image/svg+xml"})
