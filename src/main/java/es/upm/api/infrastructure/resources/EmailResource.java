@@ -2,6 +2,7 @@ package es.upm.api.infrastructure.resources;
 
 import es.upm.api.domain.model.Email;
 import es.upm.api.domain.services.EmailService;
+import es.upm.miw.security.Security;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
