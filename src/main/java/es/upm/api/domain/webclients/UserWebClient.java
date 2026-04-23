@@ -18,12 +18,12 @@ public interface UserWebClient {
     String MOBILE_ID = "/{mobile}";
 
     @GetMapping(USERS + ID_ID)
-    UserDto readUserById(@PathVariable UUID id);
+    UserDto readById(@PathVariable UUID id);
 
     @GetMapping(USERS + MOBILE_ID)
-    UserDto readUserByMobile(@PathVariable String mobile);
+    UserDto readByMobile(@PathVariable String mobile);
 
     @GetMapping(USERS)
-    List<UserDto> findNullSafe(@RequestParam(required = false) String attribute);
+    List<UserDto> find(@RequestParam(required = false) String attribute);
 
 }
