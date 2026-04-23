@@ -26,7 +26,7 @@ public class LoggingFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        log.debug(">>>>> {} {}", request.getMethod(), request.getRequestURI());
+        log.debug(">{}>>>>>>> {}", request.getMethod(), request.getRequestURI());
         Map<String, String> headerMap = Collections.list(request.getHeaderNames()).stream()
                 .collect(Collectors.toMap(name -> name, request::getHeader));
         log.debug("     Headers:{}", headerMap);
