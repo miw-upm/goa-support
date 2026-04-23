@@ -1,7 +1,7 @@
 package es.upm.api.domain.webclients;
 
 import es.upm.api.configurations.FeignConfig;
-import es.upm.api.domain.model.UserDto;
+import es.upm.api.domain.model.UserSnapshot;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,12 +18,12 @@ public interface UserWebClient {
     String MOBILE_ID = "/{mobile}";
 
     @GetMapping(USERS + ID_ID)
-    UserDto readById(@PathVariable UUID id);
+    UserSnapshot readById(@PathVariable UUID id);
 
     @GetMapping(USERS + MOBILE_ID)
-    UserDto readByMobile(@PathVariable String mobile);
+    UserSnapshot readByMobile(@PathVariable String mobile);
 
     @GetMapping(USERS)
-    List<UserDto> find(@RequestParam(required = false) String attribute);
+    List<UserSnapshot> find(@RequestParam(required = false) String attribute);
 
 }
