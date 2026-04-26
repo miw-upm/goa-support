@@ -26,10 +26,7 @@ public class SystemResource {
 
     @GetMapping
     public ApplicationInfoDto applicationInfo() {
-        return new ApplicationInfoDto(
-                "%s::%s::%s".formatted(artifact, version, build),
-                LocalDateTime.now()
-        );
+        return new ApplicationInfoDto( "%s::%s::%s".formatted(artifact, version, build), LocalDateTime.now() );
     }
 
     @GetMapping(value = VERSION_BADGE, produces = {"image/svg+xml"})
