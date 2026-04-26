@@ -56,9 +56,9 @@ public class ResourceServerConfig {
         JwtGrantedAuthoritiesConverter authorities = new JwtGrantedAuthoritiesConverter();
         authorities.setAuthorityPrefix(ROLE_AUTHORITY_PREFIX);
         authorities.setAuthoritiesClaimName(ROLES_NAME);
-        JwtAuthenticationConverter authenticatio = new JwtAuthenticationConverter();
-        authenticatio.setJwtGrantedAuthoritiesConverter(authorities);
-        return authenticatio;
+        JwtAuthenticationConverter authentication = new JwtAuthenticationConverter();
+        authentication.setJwtGrantedAuthoritiesConverter(authorities);
+        return authentication;
     }
 
 }
