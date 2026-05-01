@@ -31,7 +31,7 @@ public class SystemResource {
 
     @GetMapping(value = VERSION_BADGE, produces = {"image/svg+xml"})
     public byte[] generateBadge() {
-        return VersionBadgeGenerator.generate(hosting + ": " + artifact, "v" + version);
+        return VersionBadgeGenerator.generate(hosting + ": " + artifact, version);
     }
 
 }
