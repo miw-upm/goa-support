@@ -4,9 +4,8 @@ import es.upm.miw.exception.*;
 import feign.FeignException;
 import feign.RetryableException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.LogManager;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,8 +16,8 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
 @RequiredArgsConstructor
+@Log4j2
 public class ApiExceptionHandler {
-    private final Environment environment;
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler({
@@ -98,9 +97,7 @@ public class ApiExceptionHandler {
     })
     @ResponseBody
     public ErrorMessage exception(Exception exception) { //WARNING!!!. It is caught for unforeseen cases.The error must be properly handled or caught.
-        if (environment.acceptsProfiles(Profiles.of("dev", "test"))) {
-            exception.printStackTrace();
-        }
+        log.error("Unexpected exception", exception);
         return new ErrorMessage(exception);
     }
 
