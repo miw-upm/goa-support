@@ -59,7 +59,7 @@
         <!-- Spring cloud -->
         <spring-cloud.version>2025.0.1</spring-cloud.version>
         <!-- GOA commons -->
-        <goa-commands.version>1.8.2</goa-commands.version>
+        <goa-commands.version>1.9.1</goa-commands.version>
     </properties>
 
     <repositories>
