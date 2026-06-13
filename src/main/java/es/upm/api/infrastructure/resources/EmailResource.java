@@ -16,16 +16,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class EmailResource {
     public static final String EMAILS = "/emails";
-    public static final String SIMPLE = "/simple";
     public static final String HTML = "/html";
     public static final String ATTACHMENT = "/attachment";
 
     private final EmailService emailService;
-
-    @PostMapping(SIMPLE)
-    public void sendSimple(@Valid @RequestBody Email email) {
-        this.emailService.sendSimple(email);
-    }
 
     @PostMapping(HTML)
     public void sendHtml(@Valid @RequestBody Email email) {

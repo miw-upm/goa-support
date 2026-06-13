@@ -35,27 +35,6 @@ class EmailServiceTest {
     }
 
     @Test
-    void testSendSimple() {
-        emailService.sendSimple(Email.builder().to("to@example.com").subject("Asunto").body("Cuerpo").build());
-
-        verify(mailSender).send(any(SimpleMailMessage.class));
-    }
-
-    @Test
-    void testSendSimpleVerifyContent() {
-        ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
-
-        emailService.sendSimple(Email.builder().to("to@example.com").subject("Asunto").body("Cuerpo").build());
-
-        verify(mailSender).send(captor.capture());
-        SimpleMailMessage sent = captor.getValue();
-        assertThat(sent.getTo()).containsExactly("to@example.com");
-        assertThat(sent.getSubject()).isEqualTo("Asunto");
-        assertThat(sent.getText()).isEqualTo("Cuerpo");
-        assertThat(sent.getFrom()).isEqualTo("noreply@tudominio.com");
-    }
-
-    @Test
     void testSendHtml() {
         MimeMessage mimeMessage = new MimeMessage((Session) null);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);

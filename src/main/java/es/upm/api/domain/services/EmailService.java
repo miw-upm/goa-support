@@ -25,19 +25,6 @@ public class EmailService {
     @Value("${app.mail.from}")
     private String from;
 
-    public void sendSimple(Email email) {
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(from);
-            message.setTo(email.getTo());
-            message.setSubject(email.getSubject());
-            message.setText(email.getBody());
-            mailSender.send(message);
-        } catch (MailException e) {
-            throw new BadGatewayException("Error enviando email simple.", e);
-        }
-    }
-
     public void sendHtml(Email email) {
         try {
             MimeMessage message = mailSender.createMimeMessage();

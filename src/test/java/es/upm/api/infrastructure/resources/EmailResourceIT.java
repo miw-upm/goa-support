@@ -34,19 +34,6 @@ class EmailResourceIT {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"ROLE_admin"})
-    void shouldSendSimpleEmail() throws Exception {
-        Email email = Email.builder().to("to@example.com").subject("Asunto").body("Cuerpo").build();
-
-        mockMvc.perform(post(EmailResource.EMAILS + EmailResource.SIMPLE)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(email)))
-                .andExpect(status().isOk());
-
-        verify(emailService).sendSimple(email);
-    }
-
-    @Test
-    @WithMockUser(username = "admin", authorities = {"ROLE_admin"})
     void shouldSendHtmlEmail() throws Exception {
         Email email = Email.builder().to("to@example.com").subject("Asunto").body("<h1>Hola</h1>").build();
 
